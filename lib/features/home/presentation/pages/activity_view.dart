@@ -8,14 +8,14 @@ import 'package:wasteapp/features/home/data/Services/firebase_services.dart';
 import 'package:wasteapp/features/home/data/model/taxi_booking_model.dart';
 import 'package:wasteapp/routes/routes_extension.dart';
 
-class BookATaxiView extends StatefulWidget {
-  const BookATaxiView({super.key});
+class ActivityView extends StatefulWidget {
+  const ActivityView({super.key});
 
   @override
-  _BookATaxiViewState createState() => _BookATaxiViewState();
+  _ActivityViewState createState() => _ActivityViewState();
 }
 
-class _BookATaxiViewState extends State<BookATaxiView> {
+class _ActivityViewState extends State<ActivityView> {
   final TextEditingController _pickupController = TextEditingController();
   final TextEditingController _dropOffController = TextEditingController();
   late FlutterSecureStorage secureStorage;
@@ -30,18 +30,6 @@ class _BookATaxiViewState extends State<BookATaxiView> {
     firebaseServices = FirebaseServices();
     secureStorage = const FlutterSecureStorage();
     super.initState();
-  }
-
-  void getSecureStorageData() async {
-    var value = await secureStorage.read(key: 'isGuestMode');
-
-    setState(() {
-      if (value == 'true') {
-        isGuestMode = true;
-      } else {
-        isGuestMode = false;
-      }
-    });
   }
 
   @override

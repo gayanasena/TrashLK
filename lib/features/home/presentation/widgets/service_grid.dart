@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:wasteapp/core/resources/colors.dart';
 import 'package:wasteapp/core/resources/dimens.dart';
-import 'package:wasteapp/features/home/presentation/pages/book_a_taxi_view.dart';
-import 'package:wasteapp/features/home/presentation/pages/translate_view.dart';
+import 'package:wasteapp/features/home/presentation/pages/activity_view.dart';
+import 'package:wasteapp/features/home/presentation/pages/schadule_view.dart';
 
 class ServiceGrid extends StatelessWidget {
   const ServiceGrid({super.key});
@@ -15,17 +15,17 @@ class ServiceGrid extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           ServiceButton(
-            title: "Translate",
-            icon: Icons.translate,
+            title: "Pickup Schedules",
+            icon: Icons.schedule,
             onClick: () {
-              showTranslateBottomSheet(context);
+              showShadulesModal(context);
             },
           ),
           ServiceButton(
-            title: "Book a ride",
-            icon: Icons.local_taxi,
+            title: "Recent Activities",
+            icon: Icons.history,
             onClick: () {
-              showBookACabBottomSheet(context);
+              showActivitiesModal(context);
             },
           ),
         ],
@@ -34,7 +34,7 @@ class ServiceGrid extends StatelessWidget {
   }
 }
 
-void showTranslateBottomSheet(BuildContext context) {
+void showShadulesModal(BuildContext context) {
   showModalBottomSheet(
     clipBehavior: Clip.antiAlias,
     context: context,
@@ -49,13 +49,13 @@ void showTranslateBottomSheet(BuildContext context) {
     builder: (context) {
       return Container(
         constraints: BoxConstraints(maxHeight: context.mQHeight * 0.8),
-        child: const Scaffold(body: TranslateScreen()),
+        child: const Scaffold(body: SchedulesView()),
       );
     },
   );
 }
 
-void showBookACabBottomSheet(BuildContext context) {
+void showActivitiesModal(BuildContext context) {
   showModalBottomSheet(
     clipBehavior: Clip.antiAlias,
     context: context,
@@ -70,7 +70,7 @@ void showBookACabBottomSheet(BuildContext context) {
     builder: (context) {
       return Container(
         constraints: BoxConstraints(maxHeight: context.mQHeight * 0.8),
-        child: const BookATaxiView(),
+        child: ActivityView(),
       );
     },
   );
@@ -99,7 +99,7 @@ class ServiceButton extends StatelessWidget {
           width: 180,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [primaryColor, Colors.blueAccent],
+              colors: [primaryColor, Colors.green],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

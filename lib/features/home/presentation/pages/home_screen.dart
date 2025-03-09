@@ -15,7 +15,6 @@ import 'package:wasteapp/features/home/presentation/cubit/cubit/page_indicator_c
 import 'package:wasteapp/features/home/presentation/pages/user_profile_view.dart';
 import 'package:wasteapp/features/home/presentation/widgets/carousel_card.dart';
 import 'package:wasteapp/features/home/presentation/widgets/category_grid.dart';
-import 'package:wasteapp/features/home/presentation/widgets/destination_card.dart';
 import 'package:wasteapp/features/home/presentation/widgets/service_grid.dart';
 import 'package:wasteapp/features/home/presentation/widgets/title_text.dart';
 import 'package:wasteapp/features/home/presentation/widgets/user_image_avatar.dart';
@@ -38,28 +37,30 @@ class _HomeScreenState extends State<HomeScreen> {
   List<DetailModel> lisUpcomingItems = [
     DetailModel(
       id: "0",
-      title: "title",
-      location: "",
-      locationCategory: "locationCategory",
-      category: "category",
-      season: "season",
+      title: "New master bin allocated in Wijerama area",
+      location: "Nugegoda",
+      locationCategory: "",
+      category: "",
+      season: "",
       rating: 0,
-      imageUrls: [],
-      description: "description",
-      suggestionNote: "suggestionNote",
+      imageUrls: [
+        "https://www.monash.vic.gov.au/files/assets/public/v/1/waste-sustainability/images/bin-collection-05-use-bins-assigned-to-property.jpeg",
+      ],
+      description: "",
+      suggestionNote: "",
       isFavourite: false,
     ),
     DetailModel(
       id: "1",
-      title: "title",
-      location: "location",
-      locationCategory: "locationCategory",
-      category: "category",
-      season: "season",
+      title: "New collection route changes arrived, Click to observe",
+      location: "",
+      locationCategory: "",
+      category: "",
+      season: "",
       rating: 0,
       imageUrls: [],
-      description: "description",
-      suggestionNote: "suggestionNote",
+      description: "",
+      suggestionNote: "",
       isFavourite: false,
     ),
   ];
@@ -244,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )
                         : Container(),
-                    const TitleText(titleText: "Discover Your Next Adventure"),
+                    const TitleText(titleText: "Services"),
                     SizedBox(
                       height: 400,
                       child: CategoryGrid(
@@ -260,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                     ),
-                    const TitleText(titleText: "Services"),
+                    const TitleText(titleText: "Features"),
                     const ServiceGrid(),
                   ],
                 ),

@@ -14,6 +14,7 @@ class Assets {
 
   // images
   String get loginBackground => "assets/images/background.png";
+  String get scanQR => "assets/images/scan_QR.jpg";
 }
 
 class CustomIcons {
