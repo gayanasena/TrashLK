@@ -11,7 +11,7 @@ import 'package:wasteapp/features/common/cubit/custom_loading/custom_loading_cub
 import 'package:wasteapp/features/common/widgets/custom_loading.dart';
 import 'package:wasteapp/features/home/data/Services/firebase_services.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';
-import 'package:wasteapp/features/home/presentation/cubit/cubit/page_indicator_cubit.dart';
+import 'package:wasteapp/features/home/presentation/cubit/page_indicator/page_indicator_cubit.dart';
 import 'package:wasteapp/features/home/presentation/pages/user_profile_view.dart';
 import 'package:wasteapp/features/home/presentation/widgets/carousel_card.dart';
 import 'package:wasteapp/features/home/presentation/widgets/category_grid.dart';
@@ -250,8 +250,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: 400,
                       child: CategoryGrid(
                         onCategoryTap: (category) {
-                          if (category == "Event Calendar") {
-                            context.toNamed(ScreenRoutes.toEventCalenderScreen);
+                          if (category == "Scan QR") {
+                            context.toNamed(ScreenRoutes.toQRScanScreen);
                           } else {
                             context.toNamed(
                               ScreenRoutes.toItemGridScreen,

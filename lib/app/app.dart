@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wasteapp/features/home/presentation/cubit/cubit/page_indicator_cubit.dart';
+import 'package:wasteapp/features/home/presentation/cubit/page_indicator/page_indicator_cubit.dart';
 import 'package:wasteapp/routes/routes.dart' as router;
 
 class App extends StatefulWidget {

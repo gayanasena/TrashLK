@@ -5,6 +5,7 @@ import 'package:wasteapp/features/home/data/model/detail_model.dart';
 import 'package:wasteapp/features/home/presentation/pages/home_screen.dart';
 import 'package:wasteapp/features/home/presentation/pages/item_detail_view.dart';
 import 'package:wasteapp/features/home/presentation/pages/items_grid_view.dart';
+import 'package:wasteapp/features/home/presentation/pages/qr_scan_view.dart';
 
 import '../features/auth/presentation/pages/login_screen.dart';
 import '../features/auth/presentation/pages/splash_screen.dart';
@@ -26,7 +27,7 @@ class ScreenRoutes {
 
   static const String toRegisterScreen = 'toRegisterScreen';
 
-  static const String toEventCalenderScreen = 'toEventCalenderScreen';
+  static const String toQRScanScreen = 'toQRScanScreen';
 }
 
 class Router {
@@ -79,6 +80,9 @@ class Router {
 
       case ScreenRoutes.toRegisterScreen:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
+
+      case ScreenRoutes.toQRScanScreen:
+        return MaterialPageRoute(builder: (_) => const QrScanView());
 
       default:
         return null;
