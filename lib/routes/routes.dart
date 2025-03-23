@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:wasteapp/features/auth/presentation/pages/register_screen.dart';
 import 'package:wasteapp/features/auth/presentation/pages/welcome_screen.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';
+import 'package:wasteapp/features/home/presentation/pages/category_finder_view.dart';
 import 'package:wasteapp/features/home/presentation/pages/home_screen.dart';
 import 'package:wasteapp/features/home/presentation/pages/item_detail_view.dart';
 import 'package:wasteapp/features/home/presentation/pages/items_grid_view.dart';
+import 'package:wasteapp/features/home/presentation/pages/near_by_bins.dart';
 import 'package:wasteapp/features/home/presentation/pages/qr_scan_view.dart';
 
 import '../features/auth/presentation/pages/login_screen.dart';
@@ -28,6 +30,10 @@ class ScreenRoutes {
   static const String toRegisterScreen = 'toRegisterScreen';
 
   static const String toQRScanScreen = 'toQRScanScreen';
+
+  static const String toCategoryFinderScreen = 'toCategoryFinderScreen';
+
+  static const String toNearByBinsScreen = 'toNearByBinsScreen';
 }
 
 class Router {
@@ -84,6 +90,12 @@ class Router {
       case ScreenRoutes.toQRScanScreen:
         return MaterialPageRoute(builder: (_) => const QrScanView());
 
+      case ScreenRoutes.toCategoryFinderScreen:
+        return MaterialPageRoute(builder: (_) => const CategoryFinderView());
+
+      case ScreenRoutes.toNearByBinsScreen:
+        return MaterialPageRoute(builder: (_) => const NearByBins());
+        
       default:
         return null;
     }

@@ -252,6 +252,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         onCategoryTap: (category) {
                           if (category == "Scan QR") {
                             context.toNamed(ScreenRoutes.toQRScanScreen);
+                          } else if (category == "Category finder") {
+                            context.toNamed(
+                              ScreenRoutes.toCategoryFinderScreen,
+                            );
+                          } else if (category == "Nearby Bins") {
+                            context.toNamed(
+                              ScreenRoutes.toNearByBinsScreen,
+                            );
                           } else {
                             context.toNamed(
                               ScreenRoutes.toItemGridScreen,

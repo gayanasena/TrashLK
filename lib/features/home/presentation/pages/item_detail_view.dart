@@ -6,7 +6,6 @@ import 'package:wasteapp/core/resources/text_styles.dart';
 import 'package:wasteapp/features/home/data/Services/firebase_services.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';
 import 'package:wasteapp/features/home/presentation/widgets/detail_carousel_card.dart';
-import 'package:wasteapp/features/home/presentation/widgets/google_maps_view.dart';
 import 'package:wasteapp/features/home/presentation/widgets/title_text.dart';
 
 class ItemDetailPage extends StatefulWidget {
@@ -326,14 +325,7 @@ class ItemDetailPageState extends State<ItemDetailPage> {
       builder: (context) {
         return Container(
           constraints: BoxConstraints(maxHeight: context.mQHeight * 0.8),
-          child: Scaffold(
-            body: MapScreen(
-              description: description,
-              latitude: lat,
-              longitude: long,
-              title: title,
-            ),
-          ),
+          child: Scaffold(body: Container()),
         );
       },
     );
