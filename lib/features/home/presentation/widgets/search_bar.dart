@@ -1,9 +1,10 @@
+
 import 'package:flutter/material.dart';
 
 class CustomSearchBar extends StatefulWidget {
   final TextEditingController controller;
   final Function(String)? onChanged; // For search bar text changes
-  final List<String> availableFilters;
+  final List<String?> availableFilters;
   final Function(List<String>) onFiltersChanged; // Callback for filters
   final String? placeholderText;
 
@@ -27,9 +28,15 @@ class CustomSearchBarState extends State<CustomSearchBar> {
     final List<String>? newFilters = await showDialog(
       context: context,
       builder: (BuildContext context) {
+        List<String> aFilters = [];
+        if (widget.availableFilters.isNotEmpty) {
+          for (var element in widget.availableFilters) {
+            aFilters.add(element ?? "");
+          }
+        }
         return FilterDialog(
           selectedFilters: selectedFilters,
-          availableFilters: widget.availableFilters,
+          availableFilters: aFilters,
         );
       },
     );

@@ -5,7 +5,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:wasteapp/core/resources/colors.dart';
 import 'package:wasteapp/core/resources/text_styles.dart';
 import 'package:wasteapp/features/home/data/Services/firebase_services.dart';
-import 'package:wasteapp/features/home/data/model/taxi_booking_model.dart';
 import 'package:wasteapp/routes/routes_extension.dart';
 
 class ActivityView extends StatefulWidget {
@@ -222,16 +221,16 @@ class _ActivityViewState extends State<ActivityView> {
     }
 
     // Prepare data to be sent to Firebase
-    TaxiBookingModel bookingData = TaxiBookingModel(
-      userId: '',
-      pickupLocation: pickupLocation,
-      dropLocation: dropOffLocation,
-      rideType: _selectedRideType ?? 'Standard',
-      dateTime: DateTime.now().toString(),
-    );
+    // TaxiBookingModel bookingData = TaxiBookingModel(
+    //   userId: '',
+    //   pickupLocation: pickupLocation,
+    //   dropLocation: dropOffLocation,
+    //   rideType: _selectedRideType ?? 'Standard',
+    //   dateTime: DateTime.now().toString(),
+    // );
 
     // Send data to Firebase
-    firebaseServices.saveBookingData(bookingModel: bookingData);
+    // firebaseServices.saveBookingData(bookingModel: bookingData);
 
     // Show confirmation
     ScaffoldMessenger.of(context).showSnackBar(

@@ -34,36 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late CustomLoadingCubit customLoadingCubit;
   late String userImageUrl = '';
 
-  List<DetailModel> lisUpcomingItems = [
-    DetailModel(
-      id: "0",
-      title: "New master bin allocated in Wijerama area",
-      location: "Nugegoda",
-      locationCategory: "",
-      category: "",
-      season: "",
-      rating: 0,
-      imageUrls: [
-        "https://www.monash.vic.gov.au/files/assets/public/v/1/waste-sustainability/images/bin-collection-05-use-bins-assigned-to-property.jpeg",
-      ],
-      description: "",
-      suggestionNote: "",
-      isFavourite: false,
-    ),
-    DetailModel(
-      id: "1",
-      title: "New collection route changes arrived, Click to observe",
-      location: "",
-      locationCategory: "",
-      category: "",
-      season: "",
-      rating: 0,
-      imageUrls: [],
-      description: "",
-      suggestionNote: "",
-      isFavourite: false,
-    ),
-  ];
+  late List<CommonDetailModel> lisBanners = [];
 
   final CarouselSliderController _carouselController =
       CarouselSliderController();
@@ -73,12 +44,31 @@ class _HomeScreenState extends State<HomeScreen> {
     customLoadingCubit = CustomLoadingCubit();
     secureStorage = const FlutterSecureStorage();
     firebaseServices = FirebaseServices();
-    setUserImage();
+    startup();
     super.initState();
+  }
+
+  void startup() {
+    setUserImage();
+    getBanners();
+  }
+
+  void getBanners() async {
+    // Refresh list
+    lisBanners = [];
+
+    lisBanners = await firebaseServices.fetchAllData(
+      collectionName: DBConstants.bannersCollection,
+    );
+
+    if (lisBanners.isNotEmpty) {
+      setState(() {});
+    }
   }
 
   void setUserImage() async {
     userImageUrl = await secureStorage.read(key: 'userImageUrl') ?? '';
+    setState(() {});
   }
 
   @override
@@ -160,11 +150,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    (lisUpcomingItems.isNotEmpty)
+                    (lisBanners.isNotEmpty)
                         ? const TitleText(titleText: "What is new...")
                         : Container(),
                     // Carousel Slider
-                    (lisUpcomingItems.isNotEmpty)
+                    (lisBanners.isNotEmpty)
                         ? Padding(
                           padding: const EdgeInsetsDirectional.only(
                             top: Dimens.defaultPadding,
@@ -187,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               },
                             ),
                             items:
-                                lisUpcomingItems.map((item) {
+                                lisBanners.map((item) {
                                   return Builder(
                                     builder: (BuildContext context) {
                                       return GestureDetector(
@@ -199,11 +189,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         },
                                         child: CarouselCard(
                                           imageUrl:
-                                              item.imageUrls.isNotEmpty
-                                                  ? item.imageUrls.first
+                                              item.imageUrls?.isNotEmpty == true
+                                                  ? item.imageUrls!.first
                                                   : "",
                                           text: item.title,
-                                          subText: item.location,
+                                          subText: item.location ?? "",
                                         ),
                                       );
                                     },
@@ -212,11 +202,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )
                         : Container(),
-                    (lisUpcomingItems.isNotEmpty)
+                    (lisBanners.isNotEmpty)
                         ? const SizedBox(height: 16.0)
                         : Container(),
                     // Page Indicator
-                    (lisUpcomingItems.isNotEmpty)
+                    (lisBanners.isNotEmpty)
                         ? Align(
                           alignment: Alignment.center,
                           child: BlocBuilder<
@@ -227,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               if (state is PageIndicatorInitial) {
                                 return AnimatedSmoothIndicator(
                                   activeIndex: state.pageIndex,
-                                  count: lisUpcomingItems.length,
+                                  count: lisBanners.length,
                                   effect: const ExpandingDotsEffect(
                                     activeDotColor: primaryColor,
                                     dotHeight: 9,
@@ -257,9 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ScreenRoutes.toCategoryFinderScreen,
                             );
                           } else if (category == "Nearby Bins") {
-                            context.toNamed(
-                              ScreenRoutes.toNearByBinsScreen,
-                            );
+                            context.toNamed(ScreenRoutes.toNearByBinsScreen);
                           } else {
                             context.toNamed(
                               ScreenRoutes.toItemGridScreen,

@@ -9,7 +9,7 @@ import 'package:wasteapp/features/home/presentation/widgets/detail_carousel_card
 import 'package:wasteapp/features/home/presentation/widgets/title_text.dart';
 
 class ItemDetailPage extends StatefulWidget {
-  final DetailModel detailModel;
+  final CommonDetailModel detailModel;
 
   const ItemDetailPage({super.key, required this.detailModel});
 
@@ -25,19 +25,19 @@ class ItemDetailPageState extends State<ItemDetailPage> {
   @override
   void initState() {
     firebaseServices = FirebaseServices();
-    isFavorite = widget.detailModel.isFavourite;
+    isFavorite = widget.detailModel.isFlag ?? false;
     super.initState();
   }
 
   void toggleFavorite() {
     setState(() {
       isFavorite = !isFavorite;
-      if (widget.detailModel.mapUrl != null) {
-        firebaseServices.toggleIsFavourite(
-          isFavourite: isFavorite,
-          detailModel: widget.detailModel,
-          collection: 'destinations',
-        );
+      if (widget.detailModel.url_1 != null) {
+      //   firebaseServices.toggleIsFavourite(
+      //     isFavourite: isFavorite,
+      //     detailModel: widget.detailModel,
+      //     collection: 'destinations',
+      //   );
       }
     });
   }
@@ -111,7 +111,7 @@ class ItemDetailPageState extends State<ItemDetailPage> {
                 viewportFraction: 0.9,
               ),
               items:
-                  widget.detailModel.imageUrls.map((imageUrl) {
+                  widget.detailModel.imageUrls?.map((imageUrl) {
                     return Builder(
                       builder: (BuildContext context) {
                         return DetailCarouselCard(imageUrl: imageUrl);
@@ -169,25 +169,25 @@ class ItemDetailPageState extends State<ItemDetailPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                widget.detailModel.description,
+                widget.detailModel.description ?? "",
                 style: TextStyles(context).detailViewDescriptionText,
               ),
             ),
             // Video player
             const SizedBox(height: 16),
-            (widget.detailModel.videoUrl != null)
+            (widget.detailModel.url_2 != null)
                 ? const Padding(
                   padding: EdgeInsets.only(left: 8.0, bottom: 8.0),
                   child: TitleText(titleText: "Video"),
                 )
                 : Container(),
-            (widget.detailModel.videoUrl != null)
+            (widget.detailModel.url_2 != null)
                 ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Container(),
                 )
                 : Container(),
-            (widget.detailModel.videoUrl != null)
+            (widget.detailModel.url_2 != null)
                 ? const SizedBox(height: 16)
                 : Container(),
 
@@ -199,7 +199,7 @@ class ItemDetailPageState extends State<ItemDetailPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                widget.detailModel.suggestionNote,
+                widget.detailModel.notes ?? "",
                 style: TextStyles(context).detailViewDescriptionText,
               ),
             ),
@@ -207,7 +207,7 @@ class ItemDetailPageState extends State<ItemDetailPage> {
             const SizedBox(height: 24),
 
             // Open Map Button
-            (widget.detailModel.mapUrl != null)
+            (widget.detailModel.url_1 != null)
                 ? Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 14.0),
                   child: SizedBox(
@@ -221,7 +221,7 @@ class ItemDetailPageState extends State<ItemDetailPage> {
                         ),
                       ),
                       onPressed: () {
-                        openMap(mapUrl: widget.detailModel.mapUrl);
+                        openMap(mapUrl: widget.detailModel.url_1);
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -253,7 +253,7 @@ class ItemDetailPageState extends State<ItemDetailPage> {
         const SizedBox(width: 8),
         Flexible(
           child: Text(
-            widget.detailModel.location,
+            widget.detailModel.location ?? "",
             style: TextStyles(context).detailViewCategory,
             overflow: TextOverflow.ellipsis,
           ),
@@ -295,7 +295,7 @@ class ItemDetailPageState extends State<ItemDetailPage> {
           const Icon(Icons.calendar_today, size: 16.0, color: Colors.white),
           const SizedBox(width: 6.0),
           Text(
-            'Best Season: ${widget.detailModel.season}',
+            'Best Season: ${widget.detailModel.price}',
             style: TextStyles(
               context,
             ).detailViewCategory.copyWith(color: Colors.white),

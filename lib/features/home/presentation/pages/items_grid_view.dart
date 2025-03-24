@@ -20,9 +20,9 @@ class ItemGridView extends StatefulWidget {
 class ItemGridViewState extends State<ItemGridView> {
   late FirebaseServices firebaseServices;
   late TextEditingController searchBarTextEditingController;
-  List<DetailModel> lisDetailModel = [];
-  List<DetailModel> filteredList = [];
-  List<String> availableFilters = [];
+  List<CommonDetailModel> lisDetailModel = [];
+  List<CommonDetailModel> filteredList = [];
+  List<String?> availableFilters = [];
   String currentSearchStr = "";
   List<String> lisCurrentSelectedFilters = [];
 
@@ -58,7 +58,7 @@ class ItemGridViewState extends State<ItemGridView> {
 
   // Filter function based on search text and category filter
   void filterSearchResults(String query, {List<String>? selectedFilters}) {
-    List<DetailModel> tempList = [];
+    List<CommonDetailModel> tempList = [];
 
     // Check if there is a query or selected filters
     if (query.isNotEmpty ||
@@ -165,7 +165,7 @@ class ItemGridViewState extends State<ItemGridView> {
                                 topRight: Radius.circular(12.0),
                               ),
                               child: Image.network(
-                                item.imageUrls.first,
+                                item.imageUrls?.first ?? "",
                                 height: 120,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
@@ -187,7 +187,7 @@ class ItemGridViewState extends State<ItemGridView> {
                                   ),
                                   const SizedBox(height: 4.0),
                                   Text(
-                                    item.description,
+                                    item.description ?? "",
                                     style: TextStyle(
                                       fontSize: 15.0,
                                       color: Colors.grey.shade800,

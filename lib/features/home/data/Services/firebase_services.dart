@@ -7,8 +7,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';
-import 'package:wasteapp/features/home/data/model/taxi_booking_model.dart';
 import 'package:wasteapp/features/home/data/model/user_model.dart';
+import 'package:wasteapp/utils/constants.dart';
 
 class FirebaseServices {
   late FlutterSecureStorage secureStorage;
@@ -41,7 +41,9 @@ class FirebaseServices {
       // Save user data in secure storage if user data is found
       await secureStorage.write(key: 'uid', value: user.uid);
       await secureStorage.write(
-          key: 'username', value: "${user.firstName} ${user.lastName}");
+        key: 'username',
+        value: "${user.firstName} ${user.lastName}",
+      );
       await secureStorage.write(key: 'country', value: user.country);
       await secureStorage.write(key: 'userEmail', value: user.email);
       await secureStorage.write(key: 'userImageUrl', value: user.imageUrl);
@@ -55,15 +57,18 @@ class FirebaseServices {
   Future<UserModel?> getUserData(String uid) async {
     try {
       // Reference to the specific user's data in Firebase Realtime Database
-      DatabaseReference userRef = FirebaseDatabase.instance.ref('users/$uid');
+      DatabaseReference userRef = FirebaseDatabase.instance.ref(
+        '${DBConstants.usersCollection}/$uid',
+      );
 
       // Fetch the user data snapshot
       DatabaseEvent event = await userRef.once();
 
       if (event.snapshot.value != null) {
         // Convert snapshot to a Map and then to a UserModel
-        Map<String, dynamic> userData =
-            Map<String, dynamic>.from(event.snapshot.value as Map);
+        Map<String, dynamic> userData = Map<String, dynamic>.from(
+          event.snapshot.value as Map,
+        );
         return UserModel.fromMap(userData);
       } else {
         print('User not found.');
@@ -78,65 +83,73 @@ class FirebaseServices {
   Future<void> saveUserData(UserModel user) async {
     try {
       // Reference to the 'users' node in Firebase Realtime Database
-      DatabaseReference usersRef =
-          FirebaseDatabase.instance.ref('users/${user.uid}');
+      DatabaseReference usersRef = FirebaseDatabase.instance.ref(
+        'users/${user.uid}',
+      );
 
       // Save user data as a map using the toMap method in UserModel
-      await usersRef.set(user.toMap()).then((_) {
-        print('User data saved successfully');
-      }).catchError((error) {
-        print('User data saved faild, ${error.toString()}');
-      });
+      await usersRef
+          .set(user.toMap())
+          .then((_) {
+            print('User data saved successfully');
+          })
+          .catchError((error) {
+            print('User data saved faild, ${error.toString()}');
+          });
       print('User data saved successfully');
     } catch (error) {
       print('Failed to save user data: $error');
     }
   }
 
-  Future<void> saveBookingData({required TaxiBookingModel bookingModel}) async {
+  Future<void> saveData({required dynamic model,  required String collectionName}) async {
     try {
       var uid = getUserId();
-      DatabaseReference ref = FirebaseDatabase.instance.ref('taxi_booking/');
+      DatabaseReference ref = FirebaseDatabase.instance.ref('$collectionName/');
       DatabaseReference newRecordRef =
           ref.push(); // This generates a unique key
       newRecordRef.key!;
-      bookingModel.userId = uid;
-      // Save user data as a map using the toMap method in UserModel
-      await newRecordRef.set(bookingModel.toMap()).then((_) {
-        print('User data saved successfully');
-      }).catchError((error) {
-        print('User data saved faild, ${error.toString()}');
-      });
-      print('User data saved successfully');
+      model.userId = uid;
+      
+      await newRecordRef
+          .set(model.toMap())
+          .then((_) {
+            print('Data saved successfully');
+          })
+          .catchError((error) {
+            print('Data saved faild, ${error.toString()}');
+          });
+      print('Data saved successfully');
     } catch (error) {
-      print('Failed to save user data: $error');
+      print('Failed to save data: $error');
     }
   }
 
-  void toggleIsFavourite(
-      {required bool isFavourite,
-      required DetailModel detailModel,
-      required String collection}) async {
-    try {
-      DatabaseReference destinationRef = FirebaseDatabase.instance.ref(
-          '$collection/${detailModel.id}'); 
+  // void toggleIsFavourite({
+  //   required bool isFavourite,
+  //   required CommonDetailModel detailModel,
+  //   required String collection,
+  // }) async {
+  //   try {
+  //     DatabaseReference destinationRef = FirebaseDatabase.instance.ref(
+  //       '$collection/${detailModel.id}',
+  //     );
 
-      // Update the isFavourite field in Firebase
-      await destinationRef.update({
-        'isFavourite': isFavourite,
-      });
-      print('Successfully updated isFavourite field.');
-    } catch (e) {
-      print('Error updating isFavourite field: $e');
-    }
-  }
+  //     // Update the isFavourite field in Firebase
+  //     await destinationRef.update({'isFavourite': isFavourite});
+  //     print('Successfully updated isFavourite field.');
+  //   } catch (e) {
+  //     print('Error updating isFavourite field: $e');
+  //   }
+  // }
 
-  
   Future<String?> uploadImage(File image) async {
     try {
       String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      Reference storageRef =
-          FirebaseStorage.instance.ref().child('user_images').child(fileName);
+      Reference storageRef = FirebaseStorage.instance
+          .ref()
+          .child('user_images')
+          .child(fileName);
 
       await storageRef.putFile(image);
       String downloadUrl = await storageRef.getDownloadURL();
@@ -146,13 +159,17 @@ class FirebaseServices {
     }
   }
 
-  Future<void> uploadItemList(List<DetailModel> items, String path) async {
-    DatabaseReference ref =
-        FirebaseDatabase.instance.ref(path); // Firebase path to store items
+  Future<void> uploadItemList(
+    List<CommonDetailModel> items,
+    String collectionName,
+  ) async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref(
+      collectionName,
+    ); // Firebase path to store items
 
     // Convert the list of DetailTableModel items into a map
     Map<String, Map<String, dynamic>> itemsMap = {
-      for (DetailModel item in items) item.id: item.toJson()
+      for (CommonDetailModel item in items) item.id: item.toJson(),
     };
 
     try {
@@ -164,12 +181,14 @@ class FirebaseServices {
     }
   }
 
-  Future<List<DetailModel>> fetchAllData(
-      {required String collectionName}) async {
-    DatabaseReference ref =
-        FirebaseDatabase.instance.ref().child(collectionName);
+  Future<List<CommonDetailModel>> fetchAllData({
+    required String collectionName,
+  }) async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref().child(
+      collectionName,
+    );
 
-    List<DetailModel> items = [];
+    List<CommonDetailModel> items = [];
 
     try {
       DatabaseEvent event = await ref.once();
@@ -180,21 +199,24 @@ class FirebaseServices {
           List<dynamic> data = event.snapshot.value as List<dynamic>;
 
           // Convert data to a list of DetailTableModel instances, skipping nulls
-          items = data.where((item) => item != null).map((item) {
-            Map<String, dynamic> itemData = Map<String, dynamic>.from(item);
-            return DetailModel.fromJson(itemData);
-          }).toList();
+          items =
+              data.where((item) => item != null).map((item) {
+                Map<String, dynamic> itemData = Map<String, dynamic>.from(item);
+                return CommonDetailModel.fromJson(itemData);
+              }).toList();
         } else if (event.snapshot.value is Map) {
           // Case when the data is a map
           Map<dynamic, dynamic> data =
               event.snapshot.value as Map<dynamic, dynamic>;
 
           // Convert data to a list of DetailTableModel instances
-          items = data.entries.map((entry) {
-            Map<String, dynamic> itemData =
-                Map<String, dynamic>.from(entry.value);
-            return DetailModel.fromJson(itemData);
-          }).toList();
+          items =
+              data.entries.map((entry) {
+                Map<String, dynamic> itemData = Map<String, dynamic>.from(
+                  entry.value,
+                );
+                return CommonDetailModel.fromJson(itemData);
+              }).toList();
         } else {
           print('Unknown data format');
         }

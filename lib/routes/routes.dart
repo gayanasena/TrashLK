@@ -65,19 +65,19 @@ class Router {
       case ScreenRoutes.toItemDetailScreen:
         var args =
             settings.arguments != null
-                ? settings.arguments as DetailModel
-                : DetailModel(
+                ? settings.arguments as CommonDetailModel
+                : CommonDetailModel(
                   id: "",
                   title: "",
                   location: "",
-                  locationCategory: "",
+                  subLocation: "",
                   category: "",
-                  season: "",
-                  rating: 0.0,
+                  price: "",
+                  percentage: 0.0,
                   imageUrls: [],
                   description: "",
-                  suggestionNote: "",
-                  isFavourite: false,
+                  notes: "",
+                  isFlag: false,
                 );
 
         return MaterialPageRoute(
@@ -95,7 +95,7 @@ class Router {
 
       case ScreenRoutes.toNearByBinsScreen:
         return MaterialPageRoute(builder: (_) => const NearByBins());
-        
+
       default:
         return null;
     }
