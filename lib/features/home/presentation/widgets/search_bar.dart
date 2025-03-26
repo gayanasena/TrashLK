@@ -1,20 +1,19 @@
-
 import 'package:flutter/material.dart';
 
 class CustomSearchBar extends StatefulWidget {
   final TextEditingController controller;
-  final Function(String)? onChanged; // For search bar text changes
-  final List<String?> availableFilters;
-  final Function(List<String>) onFiltersChanged; // Callback for filters
-  final String? placeholderText;
+  final Function(String) onChanged;
+  final List<String> availableFilters;
+  final Function(List<String>) onFiltersChanged;
+  final String placeholderText;
 
   const CustomSearchBar({
     super.key,
     required this.controller,
-    this.onChanged,
+    required this.onChanged,
     required this.availableFilters,
     required this.onFiltersChanged,
-    this.placeholderText,
+    required this.placeholderText,
   });
 
   @override
@@ -25,18 +24,12 @@ class CustomSearchBarState extends State<CustomSearchBar> {
   List<String> selectedFilters = [];
 
   void showFilterPopup(BuildContext context) async {
-    final List<String>? newFilters = await showDialog(
+    final List<String>? newFilters = await showDialog<List<String>>(
       context: context,
       builder: (BuildContext context) {
-        List<String> aFilters = [];
-        if (widget.availableFilters.isNotEmpty) {
-          for (var element in widget.availableFilters) {
-            aFilters.add(element ?? "");
-          }
-        }
         return FilterDialog(
           selectedFilters: selectedFilters,
-          availableFilters: aFilters,
+          availableFilters: widget.availableFilters,
         );
       },
     );
@@ -45,7 +38,6 @@ class CustomSearchBarState extends State<CustomSearchBar> {
       setState(() {
         selectedFilters = newFilters;
       });
-      // Notify parent widget of the new selected filters
       widget.onFiltersChanged(selectedFilters);
     }
   }
@@ -54,7 +46,6 @@ class CustomSearchBarState extends State<CustomSearchBar> {
     setState(() {
       selectedFilters.clear();
     });
-    // Notify parent widget of cleared filters
     widget.onFiltersChanged(selectedFilters);
   }
 
@@ -78,11 +69,11 @@ class CustomSearchBarState extends State<CustomSearchBar> {
             ),
             child: TextField(
               controller: widget.controller,
-              onChanged: widget.onChanged, // Search text changed event
+              onChanged: widget.onChanged,
               decoration: InputDecoration(
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 suffixIcon:
-                    selectedFilters.isNotEmpty
+                    widget.availableFilters.isNotEmpty
                         ? IconButton(
                           icon: const Icon(
                             Icons.filter_list,
@@ -91,10 +82,7 @@ class CustomSearchBarState extends State<CustomSearchBar> {
                           onPressed: () => showFilterPopup(context),
                         )
                         : null,
-                hintText:
-                    (widget.placeholderText != null)
-                        ? widget.placeholderText
-                        : 'Search...',
+                hintText: widget.placeholderText,
                 hintStyle: TextStyle(color: Colors.grey[500]),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 15.0),
@@ -102,48 +90,45 @@ class CustomSearchBarState extends State<CustomSearchBar> {
             ),
           ),
         ),
-        selectedFilters.isNotEmpty
-            ? Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 16.0,
-              ),
-              child: Wrap(
-                spacing: 8.0,
-                runSpacing: 4.0,
-                children: [
-                  ...selectedFilters.map(
-                    (filter) => Chip(
-                      label: Text(filter),
-                      backgroundColor: Colors.grey[300],
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide.none,
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      onDeleted: () {
-                        setState(() {
-                          selectedFilters.remove(filter);
-                        });
-                        widget.onFiltersChanged(
-                          selectedFilters,
-                        ); // Update parent on filter deletion
-                      },
-                    ),
-                  ),
-                  ActionChip(
-                    label: const Text('Clear Filters'),
-                    onPressed: clearFilters,
-                    backgroundColor: Colors.red,
+        if (selectedFilters.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 8.0,
+              horizontal: 16.0,
+            ),
+            child: Wrap(
+              spacing: 8.0,
+              runSpacing: 4.0,
+              children: [
+                ...selectedFilters.map(
+                  (filter) => Chip(
+                    label: Text(filter),
+                    backgroundColor: Colors.grey[300],
                     shape: RoundedRectangleBorder(
                       side: BorderSide.none,
                       borderRadius: BorderRadius.circular(20.0),
                     ),
-                    labelStyle: const TextStyle(color: Colors.white),
+                    onDeleted: () {
+                      setState(() {
+                        selectedFilters.remove(filter);
+                      });
+                      widget.onFiltersChanged(selectedFilters);
+                    },
                   ),
-                ],
-              ),
-            )
-            : Container(),
+                ),
+                ActionChip(
+                  label: const Text('Clear Filters'),
+                  onPressed: clearFilters,
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide.none,
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  labelStyle: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -196,12 +181,10 @@ class FilterDialogState extends State<FilterDialog> {
                   label: Text(filter),
                   selected: tempSelectedFilters.contains(filter),
                   onSelected: (_) => toggleFilter(filter),
-                  backgroundColor:
-                      Colors.grey[300], // Gray color without a border
-                  selectedColor:
-                      Colors.blue[400], // Optional selected color for better UX
+                  backgroundColor: Colors.grey[300],
+                  selectedColor: Colors.blue[400],
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0), // Fully rounded
+                    borderRadius: BorderRadius.circular(20.0),
                   ),
                 );
               }).toList(),
@@ -209,7 +192,7 @@ class FilterDialogState extends State<FilterDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(widget.selectedFilters),
+          onPressed: () => Navigator.of(context).pop(null),
           child: const Text('Cancel', style: TextStyle(color: Colors.black)),
         ),
         TextButton(

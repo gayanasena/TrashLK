@@ -5,30 +5,104 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:wasteapp/core/resources/colors.dart';
 import 'package:wasteapp/core/resources/text_styles.dart';
 import 'package:wasteapp/features/home/data/Services/firebase_services.dart';
+import 'package:wasteapp/features/home/data/model/detail_model.dart';
+import 'package:wasteapp/features/home/presentation/widgets/search_bar.dart';
+import 'package:wasteapp/routes/routes.dart';
 import 'package:wasteapp/routes/routes_extension.dart';
+import 'package:wasteapp/utils/constants.dart';
 
 class ActivityView extends StatefulWidget {
   const ActivityView({super.key});
 
   @override
-  _ActivityViewState createState() => _ActivityViewState();
+  ActivityViewState createState() => ActivityViewState();
 }
 
-class _ActivityViewState extends State<ActivityView> {
-  final TextEditingController _pickupController = TextEditingController();
-  final TextEditingController _dropOffController = TextEditingController();
+class ActivityViewState extends State<ActivityView> {
   late FlutterSecureStorage secureStorage;
-  bool isGuestMode = false;
-
+  late TextEditingController searchBarTextEditingController;
   late FirebaseServices firebaseServices;
 
-  String? _selectedRideType;
+  bool isGuestMode = false;
+
+  List<CommonDetailModel> lisActivities = [];
+  List<CommonDetailModel> lisFilterd = [];
+  List<String> availableFilters = [];
+  String currentSearchStr = "";
+  List<String> lisCurrentSelectedFilters = [];
 
   @override
   void initState() {
     firebaseServices = FirebaseServices();
     secureStorage = const FlutterSecureStorage();
+    searchBarTextEditingController = TextEditingController();
     super.initState();
+
+    getListData();
+  }
+
+  void getListData() async {
+    lisActivities = [];
+
+    List<CommonDetailModel> fetchedData = await firebaseServices.fetchAllData(
+      collectionName: DBConstants.activitiesCollection,
+    );
+
+    var uid = await secureStorage.read(key: 'uid');
+
+    if (uid != "") {
+      for (CommonDetailModel model in fetchedData) {
+        if (model.uId == uid) {
+          lisActivities.add(model);
+        }
+      }
+    }
+
+    setState(() {
+      lisFilterd = List.from(lisActivities);
+
+      // Extract values for filters, ensuring non-null values
+      availableFilters =
+          lisActivities
+              .map((item) => item.category)
+              .whereType<String>() 
+              .toSet()
+              .toList();
+    });
+  }
+
+  // Filter function based on search text and category filter
+  void filterSearchResults(String query, {List<String>? selectedFilters}) {
+    List<CommonDetailModel> tempList = [];
+
+    if (query.isNotEmpty || (selectedFilters?.isNotEmpty ?? false)) {
+      tempList =
+          lisActivities.where((item) {
+            final matchesSearch = item.title.toLowerCase().contains(
+              query.toLowerCase(),
+            );
+            final matchesCategory =
+                selectedFilters == null ||
+                selectedFilters.isEmpty ||
+                selectedFilters.contains(
+                  item.category ?? "",
+                ); // Handle null category
+
+            return matchesSearch && matchesCategory;
+          }).toList();
+    } else {
+      tempList = List.from(lisActivities);
+    }
+
+    setState(() {
+      lisFilterd = tempList;
+    });
+  }
+
+  @override
+  void dispose() {
+    searchBarTextEditingController.dispose();
+    super.dispose();
   }
 
   @override
@@ -40,206 +114,195 @@ class _ActivityViewState extends State<ActivityView> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text("Book a taxi", style: TextStyles(context).appBarText),
+        title: Text("Recent Activities", style: TextStyles(context).appBarText),
         elevation: 0,
       ),
       backgroundColor: ApplicationColors(context).appWhiteBackground,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 8.0),
+            CustomSearchBar(
+              controller: searchBarTextEditingController,
+              onChanged: (searchString) {
+                currentSearchStr = searchString;
+                filterSearchResults(
+                  searchString,
+                  selectedFilters: lisCurrentSelectedFilters,
+                );
+              },
+              availableFilters: availableFilters,
+              onFiltersChanged: (selectedFilters) {
+                filterSearchResults(
+                  currentSearchStr,
+                  selectedFilters: selectedFilters,
+                );
+              },
+              placeholderText: 'Search',
+            ),
+            const SizedBox(height: 16.0),
+            Expanded(
+              child: ListView.builder(
+                itemCount: lisFilterd.length,
+                itemBuilder: (context, index) {
+                  final item = lisFilterd[index];
+                  return ActivityCardView(item: item);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ActivityCardView extends StatelessWidget {
+  const ActivityCardView({super.key, required this.item});
+
+  final CommonDetailModel item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 4,
+        child: Container(
+          color: Colors.white,
+          width: 350,
+          padding: EdgeInsets.all(16),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10),
-
-              // Pick-up Location Input
-              const Text(
-                "Pick-up Location",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _pickupController,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(
-                    Icons.location_on,
-                    color: primaryColor,
+              // Top row with image and order ID
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    radius: 20,
+                    backgroundImage: AssetImage('assets/images/service.png'),
                   ),
-                  hintText: "Enter pick-up location",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${item.category}: Ref Id - ${item.id}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '${item.notes}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              // Delivery tag
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 91, 177, 94),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  "${item.category}",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // Drop-off Location Input
-              const Text(
-                "Drop-off Location",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: _dropOffController,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(
-                    Icons.location_on_outlined,
-                    color: primaryColor,
+              SizedBox(height: 10),
+              // Location details
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.radio_button_checked, color: Colors.lime),
+                      SizedBox(width: 8),
+                      Text(
+                        '${item.location}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   ),
-                  hintText: "Enter drop-off location",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Ride Options Section
-              const Text(
-                "Choose Your Ride",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 150,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _rideOption("Tuk", "2 seats", "assets/images/tuk.png"),
-                    _rideOption("Flex", "3 seats", "assets/images/flex2.png"),
-                    _rideOption("Car", "3 seats", "assets/images/flex.png"),
-                    _rideOption("SUV", "5 seats", "assets/images/suv.png"),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Confirm Booking Button
-              Center(
-                child:
-                    isGuestMode
-                        ? ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 80,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            backgroundColor: primaryColor,
-                          ),
-                          onPressed: () {
-                            _confirmBooking();
-                          },
-                          child: const Text(
-                            "Confirm Booking",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
-                        )
-                        : const Padding(
-                          padding: EdgeInsets.only(top: 8.0),
+                  item.subLocation != ""
+                      ? Padding(
+                        padding: const EdgeInsets.fromLTRB(8.0, 2.0, 8.0, 3.0),
+                        child: SizedBox(
+                          height: 30,
                           child: Text(
-                            'Please login to make a booking',
+                            " | \n | \n |",
                             style: TextStyle(
+                              fontSize: 8.0,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
                             ),
                           ),
                         ),
+                      )
+                      : Container(),
+                  item.subLocation != ""
+                      ? Row(
+                        children: [
+                          Icon(Icons.radio_button_checked, color: Colors.green),
+                          SizedBox(width: 8),
+                          Text(
+                            '${item.subLocation}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      )
+                      : Container(),
+                ],
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Ride Option Widget
-  Widget _rideOption(String type, String seats, String assetPath) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedRideType = type;
-        });
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(right: 16),
-        child: Container(
-          height: 150,
-          width: 150,
-          decoration: BoxDecoration(
-            color:
-                _selectedRideType == type
-                    ? Colors.blue.shade100
-                    : Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade200,
-                blurRadius: 6,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(assetPath, height: 60), // Replace with actual asset
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
+              // Description text
               Text(
-                type,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                '${item.description}',
+                style: TextStyle(color: Colors.blueGrey, fontSize: 15.0),
+              ),
+              SizedBox(height: 10),
+              // View details button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    context.toNamed(
+                      ScreenRoutes.toItemDetailScreen,
+                      args: item,
+                    );
+                  },
+                  label: Text(
+                    'View Details',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                  ),
                 ),
               ),
-              Text(seats, style: const TextStyle(color: Colors.grey)),
             ],
           ),
         ),
       ),
     );
-  }
-
-  // Confirm Booking and send data to Firebase
-  void _confirmBooking() {
-    String pickupLocation = _pickupController.text;
-    String dropOffLocation = _dropOffController.text;
-
-    if (pickupLocation.isEmpty ||
-        dropOffLocation.isEmpty ||
-        _selectedRideType == null) {
-      // Show error message if any field is empty
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please fill all fields and select a ride type"),
-        ),
-      );
-      return;
-    }
-
-    // Prepare data to be sent to Firebase
-    // TaxiBookingModel bookingData = TaxiBookingModel(
-    //   userId: '',
-    //   pickupLocation: pickupLocation,
-    //   dropLocation: dropOffLocation,
-    //   rideType: _selectedRideType ?? 'Standard',
-    //   dateTime: DateTime.now().toString(),
-    // );
-
-    // Send data to Firebase
-    // firebaseServices.saveBookingData(bookingModel: bookingData);
-
-    // Show confirmation
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Booking Confirmed!"),
-        backgroundColor: Colors.green,
-      ),
-    );
-
-    context.popScreen();
   }
 }

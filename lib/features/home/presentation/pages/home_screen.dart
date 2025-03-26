@@ -181,10 +181,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                   return Builder(
                                     builder: (BuildContext context) {
                                       return GestureDetector(
-                                        onTap: () {
+                                        onTap: () async {
                                           // context.toNamed(
                                           //   ScreenRoutes.toItemDetailScreen,
                                           //   args: item,
+                                          // );
+
+                                          // List<CommonDetailModel> list = [
+                                          //   CommonDetailModel(
+                                          //     id: "0",
+                                          //     title: "Test Activity",
+                                          //     description: "Test description",
+                                          //     location: "Test Location",
+                                          //     isFlag: false,
+                                          //   ),
+                                          //   CommonDetailModel(
+                                          //     id: "1",
+                                          //     title: "Test Activity 1",
+                                          //     description: "Test description 1",
+                                          //     location: "Test Location 1",
+                                          //     isFlag: false,
+                                          //   ),
+                                          // ];
+
+                                          // await firebaseServices.uploadItemList(
+                                          //   list,
+                                          //   DBConstants.activitiesCollection,
                                           // );
                                         },
                                         child: CarouselCard(

@@ -14,6 +14,7 @@ class CommonDetailModel {
   final bool? isFlag;
   final String? url_1;
   final String? url_2;
+  final String? uId;
 
   CommonDetailModel({
     required this.id,
@@ -29,6 +30,7 @@ class CommonDetailModel {
     this.isFlag = false,
     this.url_1 = "",
     this.url_2 = "",
+    this.uId = "",
   });
 
   // Factory method to create a DetailModel from JSON
@@ -46,28 +48,29 @@ class CommonDetailModel {
           (json['imageUrls'] as List?)?.map((e) => e.toString()).toList() ?? [],
       description: json['description']?.toString() ?? "",
       notes: json['notes']?.toString() ?? "",
-      isFlag: json['isFlag'] as bool? ?? false, // Default to false
+      isFlag: json['isFlag'] as bool? ?? false,
       url_1: json['url_1']?.toString() ?? "",
       url_2: json['url_2']?.toString() ?? "",
+      uId: json['uId']?.toString() ?? "",
     );
   }
 
-  // Convert the object to a Map<String, dynamic> that Firebase can store
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
       'location': location,
-      'subLocation': subLocation, // Fixed key name
+      'subLocation': subLocation,
       'category': category,
-      'price': price, // Fixed key name
-      'percentage': percentage, // Fixed key name
+      'price': price,
+      'percentage': percentage,
       'imageUrls': imageUrls, // This is a List<String>
       'description': description,
-      'notes': notes, // Fixed key name
-      'isFlag': isFlag, // Fixed key name
-      'url_1': url_1, // Fixed key name
-      'url_2': url_2, // Fixed key name
+      'notes': notes,
+      'isFlag': isFlag,
+      'url_1': url_1,
+      'url_2': url_2,
+      'uId': uId,
     };
   }
 }
