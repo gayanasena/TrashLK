@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:wasteapp/features/home/data/model/bins_model.dart';
 import 'package:wasteapp/utils/constants.dart';
 import 'package:wasteapp/core/resources/colors.dart';
 import 'package:wasteapp/core/resources/dimens.dart';
@@ -187,26 +188,42 @@ class _HomeScreenState extends State<HomeScreen> {
                                           //   args: item,
                                           // );
 
-                                          // List<CommonDetailModel> list = [
-                                          //   CommonDetailModel(
-                                          //     id: "0",
-                                          //     title: "Test Activity",
-                                          //     description: "Test description",
-                                          //     location: "Test Location",
-                                          //     isFlag: false,
+                                          // final List<Bin> binsNearKurunegala = [
+                                          //   Bin(
+                                          //     capacity: 100,
+                                          //     inService: true,
+                                          //     lang: 7.4868,
+                                          //     long: 80.3648,
+                                          //     location: 'Kurunegala Town',
+                                          //     ownerId: 'owner_1',
+                                          //     reference: 'bin_1',
+                                          //     type: 'user',
                                           //   ),
-                                          //   CommonDetailModel(
-                                          //     id: "1",
-                                          //     title: "Test Activity 1",
-                                          //     description: "Test description 1",
-                                          //     location: "Test Location 1",
-                                          //     isFlag: false,
+                                          //   Bin(
+                                          //     capacity: 80,
+                                          //     inService: true,
+                                          //     lang: 7.4805,
+                                          //     long: 80.3671,
+                                          //     location: 'Wehera Junction',
+                                          //     ownerId: 'owner_2',
+                                          //     reference: 'bin_2',
+                                          //     type: 'user',
+                                          //   ),
+                                          //   Bin(
+                                          //     capacity: 120,
+                                          //     inService: true,
+                                          //     lang: 7.5001,
+                                          //     long: 80.3786,
+                                          //     location: 'Malkaduwawa',
+                                          //     ownerId: 'owner_3',
+                                          //     reference: 'bin_3',
+                                          //     type: 'user',
                                           //   ),
                                           // ];
 
-                                          // await firebaseServices.uploadItemList(
-                                          //   list,
-                                          //   DBConstants.activitiesCollection,
+                                          // await firebaseServices.uploadBinList(
+                                          //   binsNearKurunegala,
+                                          //   DBConstants.binsCollection,
                                           // );
                                         },
                                         child: CarouselCard(

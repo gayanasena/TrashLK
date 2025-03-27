@@ -7,6 +7,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:wasteapp/features/home/data/model/accounts_model.dart';
+import 'package:wasteapp/features/home/data/model/bins_model.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';
 import 'package:wasteapp/features/home/data/model/user_model.dart';
 import 'package:wasteapp/utils/constants.dart';
@@ -211,6 +212,25 @@ class FirebaseServices {
     }
   }
 
+  Future<void> uploadBinList(List<Bin> items, String collectionName) async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref(
+      collectionName,
+    ); // Firebase path to store items
+
+    // Convert the list of DetailTableModel items into a map
+    Map<String, Map<String, dynamic>> itemsMap = {
+      for (Bin item in items) item.reference: item.toMap(),
+    };
+
+    try {
+      // Upload the entire map to Firebase at the given path
+      await ref.set(itemsMap);
+      print('Items uploaded successfully');
+    } catch (error) {
+      print('Failed to upload items: $error');
+    }
+  }
+
   Future<List<CommonDetailModel>> fetchAllData({
     required String collectionName,
   }) async {
@@ -246,6 +266,53 @@ class FirebaseServices {
                   entry.value,
                 );
                 return CommonDetailModel.fromJson(itemData);
+              }).toList();
+        } else {
+          print('Unknown data format');
+        }
+      } else {
+        print('No data available');
+      }
+    } catch (error) {
+      print('Failed to fetch data: $error');
+    }
+
+    return items;
+  }
+
+  Future<List<Bin>> fetchAllBins() async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref().child(
+      DBConstants.binsCollection,
+    );
+
+    List<Bin> items = [];
+
+    try {
+      DatabaseEvent event = await ref.once();
+
+      if (event.snapshot.value != null) {
+        if (event.snapshot.value is List) {
+          // Case when the data is a list
+          List<dynamic> data = event.snapshot.value as List<dynamic>;
+
+          // Convert data to a list of DetailTableModel instances, skipping nulls
+          items =
+              data.where((item) => item != null).map((item) {
+                Map<String, dynamic> itemData = Map<String, dynamic>.from(item);
+                return Bin.fromMap(itemData);
+              }).toList();
+        } else if (event.snapshot.value is Map) {
+          // Case when the data is a map
+          Map<dynamic, dynamic> data =
+              event.snapshot.value as Map<dynamic, dynamic>;
+
+          // Convert data to a list of Bin instances
+          items =
+              data.entries.map((entry) {
+                Map<String, dynamic> itemData = Map<String, dynamic>.from(
+                  entry.value,
+                );
+                return Bin.fromMap(itemData);
               }).toList();
         } else {
           print('Unknown data format');

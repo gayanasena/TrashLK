@@ -27,6 +27,7 @@ dependencies:
   location: ^8.0.0
   qr_code_scanner_plus: ^2.0.10+1
   smooth_page_indicator: ^1.2.1
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

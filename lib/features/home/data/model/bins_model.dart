@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Bin {
   final String reference;
   final String location;
@@ -46,4 +48,10 @@ class Bin {
       'type': type,
     };
   }
+
+  // From JSON string
+  factory Bin.fromJson(String source) => Bin.fromMap(json.decode(source));
+
+  // To JSON string
+  String toJson() => json.encode(toMap());
 }

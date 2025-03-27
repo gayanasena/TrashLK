@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:wasteapp/features/home/data/Services/firebase_services.dart';
+import 'package:wasteapp/features/home/data/model/bins_model.dart';
 import 'package:wasteapp/features/home/presentation/widgets/search_bar_without_filter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NearByBins extends StatefulWidget {
   const NearByBins({super.key});
@@ -12,6 +15,7 @@ class NearByBins extends StatefulWidget {
 }
 
 class _NearByBinsState extends State<NearByBins> {
+  late FirebaseServices firebaseServices;
   late GoogleMapController _mapController;
   LatLng? _currentLocation;
   final TextEditingController _searchController = TextEditingController();
@@ -20,10 +24,10 @@ class _NearByBinsState extends State<NearByBins> {
   @override
   void initState() {
     super.initState();
+    firebaseServices = FirebaseServices();
     _getCurrentLocation();
   }
 
-  // Get User's Current Location
   Future<void> _getCurrentLocation() async {
     if (!await Geolocator.isLocationServiceEnabled()) {
       return _showError("Location services are disabled.");
@@ -36,33 +40,55 @@ class _NearByBinsState extends State<NearByBins> {
         return _showError("Location permission denied.");
       }
     }
+
     if (permission == LocationPermission.deniedForever) {
       return _showError("Location permissions are permanently denied.");
     }
 
-    // Get user's current position
     Position position = await Geolocator.getCurrentPosition();
     LatLng userLocation = LatLng(position.latitude, position.longitude);
+
+    List<Bin> lisBins = await firebaseServices.fetchAllBins();
+    Set<Marker> newMarkers = {};
+
+    for (Bin item in lisBins) {
+      final markerIcon = await BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(48, 48)),
+        "assets/images/${item.type}.png",
+      );
+
+      newMarkers.add(
+        Marker(
+          icon: markerIcon,
+          markerId: MarkerId(item.reference),
+          position: LatLng(item.lang, item.long),
+          infoWindow: InfoWindow(title: item.location),
+          onTap: () async {
+            final googleMapsUrl =
+                'https://www.google.com/maps/dir/?api=1&destination=${item.lang},${item.long}&travelmode=driving';
+            final uri = Uri.parse(googleMapsUrl);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            } else {
+              _showError("Could not launch Google Maps.");
+            }
+          },
+        ),
+      );
+    }
 
     setState(() {
       _currentLocation = userLocation;
       _markers.clear();
-      _markers.add(
-        Marker(
-          markerId: const MarkerId("current_location"),
-          position: userLocation,
-          infoWindow: const InfoWindow(title: "Your Location"),
-        ),
-      );
+      _markers.addAll(newMarkers);
     });
 
-    // Move camera to user's location
     _mapController.animateCamera(CameraUpdate.newLatLngZoom(userLocation, 15));
   }
 
-  // Search Location by Address
   Future<void> _searchLocation(String query) async {
     if (query.isEmpty) return;
+
     try {
       List<Location> locations = await locationFromAddress(query);
       if (locations.isNotEmpty) {
@@ -79,7 +105,6 @@ class _NearByBinsState extends State<NearByBins> {
           );
         });
 
-        // Move camera to user's location
         _mapController.animateCamera(
           CameraUpdate.newLatLngZoom(newLocation, 15),
         );
@@ -89,7 +114,6 @@ class _NearByBinsState extends State<NearByBins> {
     }
   }
 
-  // Show error message
   void _showError(String message) {
     ScaffoldMessenger.of(
       context,
@@ -118,6 +142,8 @@ class _NearByBinsState extends State<NearByBins> {
                 zoom: 14.0,
               ),
               markers: _markers,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
             ),
           ),
 
@@ -137,7 +163,7 @@ class _NearByBinsState extends State<NearByBins> {
               ),
               child: SearchBarWithoutFilter(
                 controller: _searchController,
-                onPressed: () async => _searchLocation(_searchController.text),
+                onPressed: () => _searchLocation(_searchController.text),
                 placeholderText: "Search location...",
               ),
             ),
