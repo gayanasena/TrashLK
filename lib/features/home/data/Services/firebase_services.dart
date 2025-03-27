@@ -214,7 +214,7 @@ class FirebaseServices {
   Future<void> savePaymentData(CommonDetailModel model) async {
     try {
       DatabaseReference paymentRef = FirebaseDatabase.instance.ref(
-        '${DBConstants.paymentsRecordsCollection}}',
+        '${DBConstants.paymentsRecordsCollection}',
       );
 
       // Save payment data
