@@ -11,10 +11,10 @@ class NearByBins extends StatefulWidget {
   const NearByBins({super.key});
 
   @override
-  _NearByBinsState createState() => _NearByBinsState();
+  NearByBinsState createState() => NearByBinsState();
 }
 
-class _NearByBinsState extends State<NearByBins> {
+class NearByBinsState extends State<NearByBins> {
   late FirebaseServices firebaseServices;
   late GoogleMapController _mapController;
   LatLng? _currentLocation;

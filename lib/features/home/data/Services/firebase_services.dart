@@ -11,6 +11,7 @@ import 'package:wasteapp/features/home/data/model/bins_model.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';
 import 'package:wasteapp/features/home/data/model/user_model.dart';
 import 'package:wasteapp/utils/constants.dart';
+import 'package:intl/intl.dart';
 
 class FirebaseServices {
   late FlutterSecureStorage secureStorage;
@@ -156,23 +157,124 @@ class FirebaseServices {
     }
   }
 
-  // void toggleIsFavourite({
-  //   required bool isFavourite,
-  //   required CommonDetailModel detailModel,
-  //   required String collection,
-  // }) async {
-  //   try {
-  //     DatabaseReference destinationRef = FirebaseDatabase.instance.ref(
-  //       '$collection/${detailModel.id}',
-  //     );
+  Future<bool> qrScanUpdate(String qrCode, Bin binModel) async {
+    DateTime now = DateTime.now();
+    String uid = getUserId();
 
-  //     // Update the isFavourite field in Firebase
-  //     await destinationRef.update({'isFavourite': isFavourite});
-  //     print('Successfully updated isFavourite field.');
-  //   } catch (e) {
-  //     print('Error updating isFavourite field: $e');
-  //   }
-  // }
+    String title = "";
+    double price = 0.0;
+    String dateTime =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(now) +
+        DateFormat('a').format(now);
+
+    // Set title
+    if (binModel.type == "master") {
+      title = "Master bin accessed";
+      price = 150.00;
+    } else {
+      title = "User managed bin accessed";
+      price = 200.00;
+    }
+
+    CommonDetailModel model = CommonDetailModel(
+      id: "",
+      title: title,
+      BUId: binModel.ownerId,
+      category: "Debited",
+      description: "Successfully accessed the bin.",
+      imageUrls: [],
+      isFlag: false,
+      location: binModel.location,
+      notes: dateTime,
+      percentage: 0.0,
+      price: price.toString(),
+      subLocation: "",
+      uId: uid,
+      url_1: "",
+      url_2: "",
+    );
+    try {
+      // Add payment record
+      await savePaymentData(model);
+
+      // Update account
+      updateAccounts(uid, price);
+
+      // Open bin
+      updateBinIsOpen(binModel.reference, true);
+
+      return true;
+    } catch (e) {
+      print(e);
+    }
+
+    return false;
+  }
+
+  Future<void> savePaymentData(CommonDetailModel model) async {
+    try {
+      DatabaseReference paymentRef = FirebaseDatabase.instance.ref(
+        '${DBConstants.paymentsRecordsCollection}}',
+      );
+
+      // Save payment data
+      await paymentRef
+          .set(model.toJson())
+          .then((_) {
+            print('Payment data saved successfully');
+          })
+          .catchError((error) {
+            print('Payment data saved faild, ${error.toString()}');
+          });
+      print('Payment data saved successfully');
+    } catch (error) {
+      print('Failed to save payment data: $error');
+    }
+  }
+
+  void updateAccounts(String uid, double price) async {
+    final accountRef = FirebaseDatabase.instance.ref().child(
+      '${DBConstants.accountsCollection}/$uid/0',
+    );
+
+    try {
+      final snapshot = await accountRef.get();
+
+      if (snapshot.exists) {
+        final data = Map<String, dynamic>.from(snapshot.value as Map);
+
+        // Get old values
+        int oldBalance = data['currentBalance'] ?? 0;
+        int oldDue = data['dueAmount'] ?? 0;
+
+        // Add to old values
+        int newBalance = oldBalance + price.round();
+        int newDue = newBalance - oldDue;
+
+        // Update Firebase
+        await accountRef.update({
+          'currentBalance': newBalance,
+          'dueAmount': newDue,
+        });
+      } else {
+        print('Account does not exist');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> updateBinIsOpen(String binId, bool newStatus) async {
+    final binRef = FirebaseDatabase.instance.ref().child('bins/$binId');
+
+    try {
+      await binRef.update({'isOpen': newStatus});
+
+      print('isOpen updated to $newStatus for $binId');
+    } catch (e) {
+      print('Error updating isOpen: $e');
+    }
+  }
 
   Future<String?> uploadImage(File image) async {
     try {

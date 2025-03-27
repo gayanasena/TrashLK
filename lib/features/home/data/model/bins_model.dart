@@ -9,6 +9,7 @@ class Bin {
   final double lang;
   final double long;
   final String ownerId;
+  final bool isOpen;
 
   Bin({
     required this.capacity,
@@ -19,6 +20,7 @@ class Bin {
     required this.ownerId,
     required this.reference,
     required this.type,
+    required this.isOpen,
   });
 
   // From Map / JSON
@@ -32,6 +34,7 @@ class Bin {
       ownerId: map['ownerId'] ?? '',
       reference: map['reference'] ?? '',
       type: map['type'] ?? '',
+      isOpen: map['isOpen'] ?? false,
     );
   }
 
@@ -46,6 +49,7 @@ class Bin {
       'ownerId': ownerId,
       'reference': reference,
       'type': type,
+      'isOpen': isOpen,
     };
   }
 

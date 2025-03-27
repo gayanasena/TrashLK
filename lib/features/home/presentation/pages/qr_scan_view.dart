@@ -4,7 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
+import 'package:wasteapp/features/home/data/Services/firebase_services.dart';
+import 'package:wasteapp/features/home/data/model/bins_model.dart';
 import 'package:wasteapp/features/home/presentation/cubit/qr_scan/qr_scan_cubit.dart';
+import 'package:wasteapp/routes/routes_extension.dart';
 
 class QrScanView extends StatelessWidget {
   const QrScanView({super.key});
@@ -26,8 +29,24 @@ class QrScanScreen extends StatefulWidget {
 }
 
 class _QrScanScreenState extends State<QrScanScreen> {
+  late FirebaseServices firebaseServices;
   QRViewController? controller;
+
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+
+  List<Bin> lisBin = [];
+
+  @override
+  void initState() {
+    firebaseServices = FirebaseServices();
+    super.initState();
+    getBinData();
+  }
+
+  void getBinData() async {
+    lisBin = [];
+    lisBin = await firebaseServices.fetchAllBins();
+  }
 
   @override
   void reassemble() {
@@ -177,11 +196,38 @@ class _QrScanScreenState extends State<QrScanScreen> {
     }
   }
 
-  void openBinDetailView(String binCode) {
-    if (binCode.isNotEmpty) {
-      // TODO: navigate to detail view.
+  void openBinDetailView(String binCode) async {
+    if (binCode.isNotEmpty && lisBin.isNotEmpty) {
+      for (var bin in lisBin) {
+        if (binCode == bin.reference) {
+          bool result = await firebaseServices.qrScanUpdate(binCode, bin);
+
+          if (result) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Bin accessed successfully.'),
+                action: SnackBarAction(
+                  label: 'OK',
+                  onPressed: () {
+                    context.popScreen();
+                  },
+                ),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Please try again!'),
+                action: SnackBarAction(label: 'OK', onPressed: () {}),
+              ),
+            );
+          }
+        }
+      }
     } else {
-      // TODO: Show snack bar.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid QR Code, Please try again...')),
+      );
     }
   }
 }

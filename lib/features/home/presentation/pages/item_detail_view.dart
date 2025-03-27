@@ -1,7 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:wasteapp/core/resources/colors.dart';
-import 'package:wasteapp/core/resources/dimens.dart';
 import 'package:wasteapp/core/resources/text_styles.dart';
 import 'package:wasteapp/features/home/data/Services/firebase_services.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';

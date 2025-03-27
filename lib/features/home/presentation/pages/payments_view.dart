@@ -143,7 +143,7 @@ class PaymentCardView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "${item.title}",
+                  item.title,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

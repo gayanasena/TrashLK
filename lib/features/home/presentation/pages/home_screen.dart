@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:wasteapp/features/home/data/model/bins_model.dart';
 import 'package:wasteapp/utils/constants.dart';
 import 'package:wasteapp/core/resources/colors.dart';
 import 'package:wasteapp/core/resources/dimens.dart';
@@ -251,12 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             context.toNamed(ScreenRoutes.toNearByBinsScreen);
                           } else if (category == "Payments") {
                             context.toNamed(ScreenRoutes.toPayemntScreen);
-                          } else {
-                            // context.toNamed(
-                            //   ScreenRoutes.,
-                            //   args: category,
-                            // );
-                          }
+                          } else {}
                         },
                       ),
                     ),
