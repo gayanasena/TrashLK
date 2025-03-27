@@ -63,6 +63,8 @@ class _PaymentsViewState extends State<PaymentsView> {
     var uid = await secureStorage.read(key: 'uid');
 
     account = await firebaseServices.getUserAccountsData(uid!);
+
+     setState(() {});
   }
 
   @override
