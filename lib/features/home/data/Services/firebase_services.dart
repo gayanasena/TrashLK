@@ -213,20 +213,19 @@ class FirebaseServices {
 
   Future<void> savePaymentData(CommonDetailModel model) async {
     try {
-      DatabaseReference paymentRef = FirebaseDatabase.instance.ref(
-        '${DBConstants.paymentsRecordsCollection}',
-      );
+      DatabaseReference paymentRef =
+          FirebaseDatabase.instance
+              .ref(DBConstants.paymentsRecordsCollection)
+              .push(); 
 
-      // Save payment data
       await paymentRef
           .set(model.toJson())
           .then((_) {
             print('Payment data saved successfully');
           })
           .catchError((error) {
-            print('Payment data saved faild, ${error.toString()}');
+            print('Payment data save failed: ${error.toString()}');
           });
-      print('Payment data saved successfully');
     } catch (error) {
       print('Failed to save payment data: $error');
     }

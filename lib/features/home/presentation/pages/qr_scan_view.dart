@@ -35,16 +35,16 @@ class _QrScanScreenState extends State<QrScanScreen> {
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
 
   List<Bin> lisBin = [];
+  bool isDetected = false;
 
   @override
   void initState() {
-    firebaseServices = FirebaseServices();
     super.initState();
+    firebaseServices = FirebaseServices();
     getBinData();
   }
 
-  void getBinData() async {
-    lisBin = [];
+  Future<void> getBinData() async {
     lisBin = await firebaseServices.fetchAllBins();
   }
 
@@ -53,8 +53,15 @@ class _QrScanScreenState extends State<QrScanScreen> {
     super.reassemble();
     if (Platform.isAndroid) {
       controller?.pauseCamera();
+    } else if (Platform.isIOS) {
+      controller?.resumeCamera();
     }
-    controller?.resumeCamera();
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
   }
 
   @override
@@ -86,7 +93,6 @@ class _QrScanScreenState extends State<QrScanScreen> {
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           _buildFlashToggleButton(),
                           _buildCameraFlipButton(),
@@ -104,12 +110,10 @@ class _QrScanScreenState extends State<QrScanScreen> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: FloatingActionButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  shape: CircleBorder(),
+                  onPressed: () => Navigator.pop(context),
+                  shape: const CircleBorder(),
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.arrow_back, size: 24.0),
+                  child: const Icon(Icons.arrow_back, size: 24.0),
                 ),
               ),
             ],
@@ -120,7 +124,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
   }
 
   Widget _buildQrView(BuildContext context) {
-    var scanArea =
+    final scanArea =
         (MediaQuery.of(context).size.width < 400 ||
                 MediaQuery.of(context).size.height < 400)
             ? 150.0
@@ -128,11 +132,11 @@ class _QrScanScreenState extends State<QrScanScreen> {
     return QRView(
       key: qrKey,
       onQRViewCreated: (controller) {
-        setState(() {
-          this.controller = controller;
-        });
+        setState(() => this.controller = controller);
         controller.scannedDataStream.listen((scanData) {
-          context.read<QrScannerCubit>().updateScanResult(scanData);
+          if (!isDetected) {
+            context.read<QrScannerCubit>().updateScanResult(scanData);
+          }
         });
       },
       overlay: QrScannerOverlayShape(
@@ -151,8 +155,10 @@ class _QrScanScreenState extends State<QrScanScreen> {
       margin: const EdgeInsets.all(8),
       child: ElevatedButton(
         onPressed: () async {
-          await controller?.toggleFlash();
-          setState(() {});
+          if (controller != null) {
+            await controller!.toggleFlash();
+            setState(() {});
+          }
         },
         child: FutureBuilder(
           future: controller?.getFlashStatus(),
@@ -171,8 +177,10 @@ class _QrScanScreenState extends State<QrScanScreen> {
       margin: const EdgeInsets.all(8),
       child: ElevatedButton(
         onPressed: () async {
-          await controller?.flipCamera();
-          setState(() {});
+          if (controller != null) {
+            await controller!.flipCamera();
+            setState(() {});
+          }
         },
         child: FutureBuilder(
           future: controller?.getCameraInfo(),
@@ -197,34 +205,33 @@ class _QrScanScreenState extends State<QrScanScreen> {
   }
 
   void openBinDetailView(String binCode) async {
-    if (binCode.isNotEmpty && lisBin.isNotEmpty) {
-      for (var bin in lisBin) {
-        if (binCode == bin.reference) {
-          bool result = await firebaseServices.qrScanUpdate(binCode, bin);
+    if (binCode.isEmpty || lisBin.isEmpty || isDetected) return;
 
-          if (result) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Bin accessed successfully.'),
-                action: SnackBarAction(
-                  label: 'OK',
-                  onPressed: () {
-                    context.popScreen();
-                  },
-                ),
-              ),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Please try again!'),
-                action: SnackBarAction(label: 'OK', onPressed: () {}),
-              ),
-            );
-          }
-        }
+    for (var bin in lisBin) {
+      if (binCode == bin.reference) {
+        isDetected = true;
+
+        bool result = await firebaseServices.qrScanUpdate(binCode, bin);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result ? 'Bin accessed successfully.' : 'Please try again!',
+            ),
+            action: SnackBarAction(
+              label: 'OK',
+              onPressed: () {
+                isDetected = false;
+                if (result) context.popScreen();
+              },
+            ),
+          ),
+        );
+        return;
       }
-    } else {
+    }
+
+    if (!isDetected) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Invalid QR Code, Please try again...')),
       );
