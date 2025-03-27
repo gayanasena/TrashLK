@@ -1,73 +1,80 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, non_constant_identifier_names
 
-class DetailModel {
+class CommonDetailModel {
   final String id;
   final String title;
-  final String location;
-  final String locationCategory;
-  final String category;
-  final String season;
-  final double rating;
-  final List<String> imageUrls;
-  final String description;
-  final String suggestionNote;
-  final bool isFavourite;
-  final String? mapUrl;
-  final String? videoUrl;
+  final String? location;
+  final String? subLocation;
+  final String? category;
+  final String? price;
+  final double? percentage;
+  final List<String>? imageUrls;
+  final String? description;
+  final String? notes;
+  final bool? isFlag;
+  final String? url_1;
+  final String? url_2;
+  final String? uId;
+  final String? BUId;
 
-  DetailModel({
+  CommonDetailModel({
     required this.id,
     required this.title,
-    required this.location,
-    required this.locationCategory,
-    required this.category,
-    required this.season,
-    required this.rating,
-    required this.imageUrls,
-    required this.description,
-    required this.suggestionNote,
-    required this.isFavourite,
-    this.mapUrl,
-    this.videoUrl,
+    this.location = "",
+    this.subLocation = "",
+    this.category = "",
+    this.price = "",
+    this.percentage = 0.0,
+    this.imageUrls = const [],
+    this.description = "",
+    this.notes = "",
+    this.isFlag = false,
+    this.url_1 = "",
+    this.url_2 = "",
+    this.uId = "",
+    this.BUId = "",
   });
 
   // Factory method to create a DetailModel from JSON
-  factory DetailModel.fromJson(Map<String, dynamic> json) {
-    return DetailModel(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      location: json['location'] as String,
-      locationCategory: json['locationCategory'] as String,
-      category: json['category'] as String,
-      season: json['season'] as String,
-      rating: (json['rating'] as num).toDouble(), // Ensure it's a double
+  factory CommonDetailModel.fromJson(Map<String, dynamic> json) {
+    return CommonDetailModel(
+      id: json['id'] as String? ?? "", // Ensure non-null
+      title: json['title'] as String? ?? "",
+      location: json['location']?.toString() ?? "",
+      subLocation: json['subLocation']?.toString() ?? "",
+      category: json['category']?.toString() ?? "",
+      price: json['price']?.toString() ?? "",
+      percentage:
+          (json['percentage'] as num?)?.toDouble() ?? 0.0, // Safe conversion
       imageUrls:
-          List<String>.from(json['imageUrls'] ?? []), // List<String> conversion
-      description: json['description'] as String,
-      suggestionNote: json['suggestionNote'] as String,
-      isFavourite: json['isFavourite'] as bool,
-      mapUrl: json['mapUrl'] as String?, // Ensure null safety
-      videoUrl:
-          json['videoUrl'] as String?, // Corrected from mapUrl to videoUrl
+          (json['imageUrls'] as List?)?.map((e) => e.toString()).toList() ?? [],
+      description: json['description']?.toString() ?? "",
+      notes: json['notes']?.toString() ?? "",
+      isFlag: json['isFlag'] as bool? ?? false,
+      url_1: json['url_1']?.toString() ?? "",
+      url_2: json['url_2']?.toString() ?? "",
+      uId: json['uId']?.toString() ?? "",
+      BUId: json['BUId']?.toString() ?? "",
     );
   }
 
-  // Convert the object to a Map<String, dynamic> that Firebase can store
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
       'location': location,
-      'locationCategory': locationCategory,
+      'subLocation': subLocation,
       'category': category,
-      'season': season,
-      'rating': rating,
+      'price': price,
+      'percentage': percentage,
       'imageUrls': imageUrls, // This is a List<String>
       'description': description,
-      'suggestionNote': suggestionNote,
-      'isFavourite': isFavourite,
-      'mapUrl': mapUrl,
-      'videoUrl': videoUrl,
+      'notes': notes,
+      'isFlag': isFlag,
+      'url_1': url_1,
+      'url_2': url_2,
+      'uId': uId,
+      'BUId': BUId,
     };
   }
 }

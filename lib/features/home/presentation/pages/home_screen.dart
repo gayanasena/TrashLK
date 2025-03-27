@@ -11,11 +11,10 @@ import 'package:wasteapp/features/common/cubit/custom_loading/custom_loading_cub
 import 'package:wasteapp/features/common/widgets/custom_loading.dart';
 import 'package:wasteapp/features/home/data/Services/firebase_services.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';
-import 'package:wasteapp/features/home/presentation/cubit/cubit/page_indicator_cubit.dart';
+import 'package:wasteapp/features/home/presentation/cubit/page_indicator/page_indicator_cubit.dart';
 import 'package:wasteapp/features/home/presentation/pages/user_profile_view.dart';
 import 'package:wasteapp/features/home/presentation/widgets/carousel_card.dart';
 import 'package:wasteapp/features/home/presentation/widgets/category_grid.dart';
-import 'package:wasteapp/features/home/presentation/widgets/destination_card.dart';
 import 'package:wasteapp/features/home/presentation/widgets/service_grid.dart';
 import 'package:wasteapp/features/home/presentation/widgets/title_text.dart';
 import 'package:wasteapp/features/home/presentation/widgets/user_image_avatar.dart';
@@ -35,34 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late CustomLoadingCubit customLoadingCubit;
   late String userImageUrl = '';
 
-  List<DetailModel> lisUpcomingItems = [
-    DetailModel(
-      id: "0",
-      title: "title",
-      location: "",
-      locationCategory: "locationCategory",
-      category: "category",
-      season: "season",
-      rating: 0,
-      imageUrls: [],
-      description: "description",
-      suggestionNote: "suggestionNote",
-      isFavourite: false,
-    ),
-    DetailModel(
-      id: "1",
-      title: "title",
-      location: "location",
-      locationCategory: "locationCategory",
-      category: "category",
-      season: "season",
-      rating: 0,
-      imageUrls: [],
-      description: "description",
-      suggestionNote: "suggestionNote",
-      isFavourite: false,
-    ),
-  ];
+  late List<CommonDetailModel> lisBanners = [];
 
   final CarouselSliderController _carouselController =
       CarouselSliderController();
@@ -72,12 +44,31 @@ class _HomeScreenState extends State<HomeScreen> {
     customLoadingCubit = CustomLoadingCubit();
     secureStorage = const FlutterSecureStorage();
     firebaseServices = FirebaseServices();
-    setUserImage();
+    startup();
     super.initState();
+  }
+
+  void startup() {
+    setUserImage();
+    getBanners();
+  }
+
+  void getBanners() async {
+    // Refresh list
+    lisBanners = [];
+
+    lisBanners = await firebaseServices.fetchAllData(
+      collectionName: DBConstants.bannersCollection,
+    );
+
+    if (lisBanners.isNotEmpty) {
+      setState(() {});
+    }
   }
 
   void setUserImage() async {
     userImageUrl = await secureStorage.read(key: 'userImageUrl') ?? '';
+    setState(() {});
   }
 
   @override
@@ -159,11 +150,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    (lisUpcomingItems.isNotEmpty)
+                    (lisBanners.isNotEmpty)
                         ? const TitleText(titleText: "What is new...")
                         : Container(),
                     // Carousel Slider
-                    (lisUpcomingItems.isNotEmpty)
+                    (lisBanners.isNotEmpty)
                         ? Padding(
                           padding: const EdgeInsetsDirectional.only(
                             top: Dimens.defaultPadding,
@@ -186,23 +177,23 @@ class _HomeScreenState extends State<HomeScreen> {
                               },
                             ),
                             items:
-                                lisUpcomingItems.map((item) {
+                                lisBanners.map((item) {
                                   return Builder(
                                     builder: (BuildContext context) {
                                       return GestureDetector(
-                                        onTap: () {
-                                          // context.toNamed(
-                                          //   ScreenRoutes.toItemDetailScreen,
-                                          //   args: item,
-                                          // );
+                                        onTap: () async {
+                                          context.toNamed(
+                                            ScreenRoutes.toItemDetailScreen,
+                                            args: item,
+                                          );
                                         },
                                         child: CarouselCard(
                                           imageUrl:
-                                              item.imageUrls.isNotEmpty
-                                                  ? item.imageUrls.first
+                                              item.imageUrls?.isNotEmpty == true
+                                                  ? item.imageUrls!.first
                                                   : "",
                                           text: item.title,
-                                          subText: item.location,
+                                          subText: item.location ?? "",
                                         ),
                                       );
                                     },
@@ -211,11 +202,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )
                         : Container(),
-                    (lisUpcomingItems.isNotEmpty)
+                    (lisBanners.isNotEmpty)
                         ? const SizedBox(height: 16.0)
                         : Container(),
                     // Page Indicator
-                    (lisUpcomingItems.isNotEmpty)
+                    (lisBanners.isNotEmpty)
                         ? Align(
                           alignment: Alignment.center,
                           child: BlocBuilder<
@@ -226,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               if (state is PageIndicatorInitial) {
                                 return AnimatedSmoothIndicator(
                                   activeIndex: state.pageIndex,
-                                  count: lisUpcomingItems.length,
+                                  count: lisBanners.length,
                                   effect: const ExpandingDotsEffect(
                                     activeDotColor: primaryColor,
                                     dotHeight: 9,
@@ -244,23 +235,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         )
                         : Container(),
-                    const TitleText(titleText: "Discover Your Next Adventure"),
+                    const TitleText(titleText: "Services"),
                     SizedBox(
                       height: 400,
                       child: CategoryGrid(
                         onCategoryTap: (category) {
-                          if (category == "Event Calendar") {
-                            context.toNamed(ScreenRoutes.toEventCalenderScreen);
-                          } else {
+                          if (category == "Scan QR") {
+                            context.toNamed(ScreenRoutes.toQRScanScreen);
+                          } else if (category == "Category finder") {
                             context.toNamed(
-                              ScreenRoutes.toItemGridScreen,
-                              args: category,
+                              ScreenRoutes.toCategoryFinderScreen,
                             );
-                          }
+                          } else if (category == "Nearby Bins") {
+                            context.toNamed(ScreenRoutes.toNearByBinsScreen);
+                          } else if (category == "Payments") {
+                            context.toNamed(ScreenRoutes.toPayemntScreen);
+                          } else {}
                         },
                       ),
                     ),
-                    const TitleText(titleText: "Services"),
+                    const TitleText(titleText: "Features"),
                     const ServiceGrid(),
                   ],
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wasteapp/features/home/presentation/cubit/cubit/page_indicator_cubit.dart';
+import 'package:wasteapp/features/home/presentation/cubit/category_finder/category_finder_cubit.dart';
+import 'package:wasteapp/features/home/presentation/cubit/page_indicator/page_indicator_cubit.dart';
 import 'package:wasteapp/routes/routes.dart' as router;
 
 class App extends StatefulWidget {
@@ -43,6 +44,9 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       providers: [
         BlocProvider<PageIndicatorCubit>(
           create: (context) => PageIndicatorCubit(),
+        ),
+         BlocProvider<CategoryFinderCubit>(
+          create: (context) => CategoryFinderCubit(),
         ),
       ],
       child: const MaterialApp(

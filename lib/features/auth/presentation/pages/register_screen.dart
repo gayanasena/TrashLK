@@ -24,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   late TextEditingController lastNameTextEditingController;
   late TextEditingController emailTextEditingController;
   late TextEditingController passwordTextEditingController;
-  late TextEditingController countryTextEditingController;
+  late TextEditingController cityTextEditingController;
   String uid = "";
   File? _imageFile;
   String? _uploadedImageUrl;
@@ -39,7 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     lastNameTextEditingController = TextEditingController();
     emailTextEditingController = TextEditingController();
     passwordTextEditingController = TextEditingController();
-    countryTextEditingController = TextEditingController();
+    cityTextEditingController = TextEditingController();
     super.initState();
   }
 
@@ -129,11 +129,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 10),
                         OutlinedTextBox(
-                          labelText: "Your Country",
-                          controller: countryTextEditingController,
+                          labelText: "City",
+                          controller: cityTextEditingController,
                           validator:
                               (value) =>
-                                  value!.isEmpty ? 'Country is required' : null,
+                                  value!.isEmpty ? 'City is required' : null,
                         ),
                         const SizedBox(height: 10),
                         OutlinedTextBox(
@@ -224,7 +224,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           firstName: firstNameTextEditingController.text,
           lastName: lastNameTextEditingController.text,
           email: emailTextEditingController.text,
-          country: countryTextEditingController.text,
+          city: cityTextEditingController.text,
           imageUrl:
               _uploadedImageUrl ?? 'https://picsum.photos/300/200?random=5',
         );
@@ -264,7 +264,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required String firstName,
     required String lastName,
     required String email,
-    required String country,
+    required String city,
     required String imageUrl,
   }) async {
     await firebaseServices.saveUserData(
@@ -272,7 +272,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         uid: uid,
         firstName: firstName,
         lastName: lastName,
-        country: country,
+        city: city,
         email: email,
         imageUrl: imageUrl,
       ),

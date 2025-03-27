@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:wasteapp/features/auth/presentation/pages/register_screen.dart';
 import 'package:wasteapp/features/auth/presentation/pages/welcome_screen.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';
+import 'package:wasteapp/features/home/presentation/pages/category_finder_view.dart';
 import 'package:wasteapp/features/home/presentation/pages/home_screen.dart';
 import 'package:wasteapp/features/home/presentation/pages/item_detail_view.dart';
-import 'package:wasteapp/features/home/presentation/pages/items_grid_view.dart';
+import 'package:wasteapp/features/home/presentation/pages/near_by_bins.dart';
+import 'package:wasteapp/features/home/presentation/pages/payments_view.dart';
+import 'package:wasteapp/features/home/presentation/pages/qr_scan_view.dart';
 
 import '../features/auth/presentation/pages/login_screen.dart';
 import '../features/auth/presentation/pages/splash_screen.dart';
@@ -18,7 +21,7 @@ class ScreenRoutes {
 
   static const String toHomeScreen = 'toHomeScreen';
 
-  static const String toItemGridScreen = 'toItemGridScreen';
+  static const String toPayemntScreen = 'toPayemntScreen';
 
   static const String toItemDetailScreen = 'toItemDetailScreen';
 
@@ -26,7 +29,11 @@ class ScreenRoutes {
 
   static const String toRegisterScreen = 'toRegisterScreen';
 
-  static const String toEventCalenderScreen = 'toEventCalenderScreen';
+  static const String toQRScanScreen = 'toQRScanScreen';
+
+  static const String toCategoryFinderScreen = 'toCategoryFinderScreen';
+
+  static const String toNearByBinsScreen = 'toNearByBinsScreen';
 }
 
 class Router {
@@ -49,28 +56,22 @@ class Router {
       case ScreenRoutes.toHomeScreen:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
 
-      case ScreenRoutes.toItemGridScreen:
-        var args =
-            settings.arguments != null ? settings.arguments as String : "";
-
-        return MaterialPageRoute(builder: (_) => ItemGridView(gridType: args));
-
       case ScreenRoutes.toItemDetailScreen:
         var args =
             settings.arguments != null
-                ? settings.arguments as DetailModel
-                : DetailModel(
+                ? settings.arguments as CommonDetailModel
+                : CommonDetailModel(
                   id: "",
                   title: "",
                   location: "",
-                  locationCategory: "",
+                  subLocation: "",
                   category: "",
-                  season: "",
-                  rating: 0.0,
+                  price: "",
+                  percentage: 0.0,
                   imageUrls: [],
                   description: "",
-                  suggestionNote: "",
-                  isFavourite: false,
+                  notes: "",
+                  isFlag: false,
                 );
 
         return MaterialPageRoute(
@@ -79,6 +80,18 @@ class Router {
 
       case ScreenRoutes.toRegisterScreen:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
+
+      case ScreenRoutes.toQRScanScreen:
+        return MaterialPageRoute(builder: (_) => const QrScanView());
+
+      case ScreenRoutes.toCategoryFinderScreen:
+        return MaterialPageRoute(builder: (_) => const CategoryFinderView());
+
+      case ScreenRoutes.toNearByBinsScreen:
+        return MaterialPageRoute(builder: (_) => const NearByBins());
+
+      case ScreenRoutes.toPayemntScreen:
+        return MaterialPageRoute(builder: (_) => const PaymentsView());
 
       default:
         return null;

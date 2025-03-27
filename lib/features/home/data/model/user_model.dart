@@ -5,14 +5,14 @@ class UserModel {
   final String uid;
   final String firstName;
   final String lastName;
-  final String country;
+  final String city;
   final String email;
   final String imageUrl;
   UserModel({
     required this.uid,
     required this.firstName,
     required this.lastName,
-    required this.country,
+    required this.city,
     required this.email,
     required this.imageUrl,
   });
@@ -21,7 +21,7 @@ class UserModel {
     String? uid,
     String? firstName,
     String? lastName,
-    String? country,
+    String? city,
     String? email,
     String? imageUrl,
   }) {
@@ -29,7 +29,7 @@ class UserModel {
       uid: uid ?? this.uid,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
-      country: country ?? this.country,
+      city: city ?? this.city,
       email: email ?? this.email,
       imageUrl: imageUrl ?? this.imageUrl,
     );
@@ -40,7 +40,7 @@ class UserModel {
       'uid': uid,
       'firstName': firstName,
       'lastName': lastName,
-      'country': country,
+      'city': city,
       'email': email,
       'imageUrl': imageUrl,
     };
@@ -51,7 +51,7 @@ class UserModel {
       uid: map['uid'] as String,
       firstName: map['firstName'] as String,
       lastName: map['lastName'] as String,
-      country: map['country'] as String,
+      city: map['city'] as String,
       email: map['email'] as String,
       imageUrl: map['imageUrl'] as String,
     );
@@ -64,7 +64,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, firstName: $firstName, lastName: $lastName, country: $country, email: $email, imageUrl: $imageUrl)';
+    return 'UserModel(uid: $uid, firstName: $firstName, lastName: $lastName, city: $city, email: $email, imageUrl: $imageUrl)';
   }
 
   @override
@@ -74,7 +74,7 @@ class UserModel {
     return other.uid == uid &&
         other.firstName == firstName &&
         other.lastName == lastName &&
-        other.country == country &&
+        other.city == city &&
         other.email == email &&
         other.imageUrl == imageUrl;
   }
@@ -84,7 +84,7 @@ class UserModel {
     return uid.hashCode ^
         firstName.hashCode ^
         lastName.hashCode ^
-        country.hashCode ^
+        city.hashCode ^
         email.hashCode ^
         imageUrl.hashCode;
   }

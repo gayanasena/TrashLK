@@ -23,6 +23,10 @@ class CarouselCard extends StatelessWidget {
         color: ApplicationColors(context).shimmerBackground,
         borderRadius: BorderRadius.circular(16.0),
         image: DecorationImage(
+          colorFilter: ColorFilter.mode(
+            Colors.black.withValues(alpha: 0.2),
+            BlendMode.darken,
+          ),
           image: NetworkImage(
             imageUrl.isNotEmpty
                 ? imageUrl

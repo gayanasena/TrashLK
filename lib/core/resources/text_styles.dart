@@ -29,7 +29,7 @@ class TextStyles {
   late TextStyle homeCarouselHeaderText = TextStyle(
     fontFamily: 'graphik_regular_600',
     color: ApplicationColors(context).black,
-    fontSize: 20.0,
+    fontSize: 18.0,
     fontWeight: FontWeight.w500,
   );
 

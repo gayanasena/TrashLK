@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class CategoryGrid extends StatelessWidget {
   final List<Map<String, String>> items = [
-    {"title": "Event Calendar", "image": "assets/images/event_calander.jpg"},
-    {"title": "Travel Destinations", "image": "assets/images/destinations.jpg"},
-    {"title": "Hotels", "image": "assets/images/hotels.jpg"},
-    {"title": "Foods", "image": "assets/images/food.jpg"},
+    {"title": "Scan QR", "image": "assets/images/scan_QR.jpg"},
+    {"title": "Nearby Bins", "image": "assets/images/nearbybins.png"},
+    {"title": "Payments", "image": "assets/images/payments.png"},
+    {"title": "Category finder", "image": "assets/images/category.png"},
   ];
   final void Function(String category) onCategoryTap;
 
@@ -42,7 +42,7 @@ class CategoryGrid extends StatelessWidget {
                 image: AssetImage(items[index]['image']!),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.black.withValues(alpha: 0.3),
+                  Colors.black.withValues(alpha: 0.5),
                   BlendMode.darken,
                 ),
               ),
