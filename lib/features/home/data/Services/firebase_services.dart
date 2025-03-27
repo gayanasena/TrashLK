@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:wasteapp/features/home/data/model/accounts_model.dart';
 import 'package:wasteapp/features/home/data/model/detail_model.dart';
 import 'package:wasteapp/features/home/data/model/user_model.dart';
 import 'package:wasteapp/utils/constants.dart';
@@ -44,7 +45,7 @@ class FirebaseServices {
         key: 'username',
         value: "${user.firstName} ${user.lastName}",
       );
-      await secureStorage.write(key: 'country', value: user.country);
+      await secureStorage.write(key: 'city', value: user.city);
       await secureStorage.write(key: 'userEmail', value: user.email);
       await secureStorage.write(key: 'userImageUrl', value: user.imageUrl);
 
@@ -80,6 +81,32 @@ class FirebaseServices {
     }
   }
 
+  Future<Account?> getUserAccountsData(String uid) async {
+    try {
+      // Reference to the specific user's data in Firebase Realtime Database
+      DatabaseReference userRef = FirebaseDatabase.instance.ref(
+        '${DBConstants.accountsCollection}/$uid/0',
+      );
+
+      // Fetch the user data snapshot
+      DatabaseEvent event = await userRef.once();
+
+      if (event.snapshot.value != null) {
+        // Convert snapshot to a Map and then to a UserModel
+        Map<String, dynamic> data = Map<String, dynamic>.from(
+          event.snapshot.value as Map,
+        );
+        return Account.fromMap(data);
+      } else {
+        print('User not found.');
+        return null;
+      }
+    } catch (error) {
+      print('Failed to retrieve user data: $error');
+      return null;
+    }
+  }
+
   Future<void> saveUserData(UserModel user) async {
     try {
       // Reference to the 'users' node in Firebase Realtime Database
@@ -102,7 +129,10 @@ class FirebaseServices {
     }
   }
 
-  Future<void> saveData({required dynamic model,  required String collectionName}) async {
+  Future<void> saveData({
+    required dynamic model,
+    required String collectionName,
+  }) async {
     try {
       var uid = getUserId();
       DatabaseReference ref = FirebaseDatabase.instance.ref('$collectionName/');
@@ -110,7 +140,7 @@ class FirebaseServices {
           ref.push(); // This generates a unique key
       newRecordRef.key!;
       model.userId = uid;
-      
+
       await newRecordRef
           .set(model.toMap())
           .then((_) {

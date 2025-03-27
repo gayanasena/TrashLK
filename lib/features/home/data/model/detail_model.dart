@@ -15,6 +15,7 @@ class CommonDetailModel {
   final String? url_1;
   final String? url_2;
   final String? uId;
+  final String? BUId;
 
   CommonDetailModel({
     required this.id,
@@ -31,6 +32,7 @@ class CommonDetailModel {
     this.url_1 = "",
     this.url_2 = "",
     this.uId = "",
+    this.BUId = "",
   });
 
   // Factory method to create a DetailModel from JSON
@@ -52,6 +54,7 @@ class CommonDetailModel {
       url_1: json['url_1']?.toString() ?? "",
       url_2: json['url_2']?.toString() ?? "",
       uId: json['uId']?.toString() ?? "",
+      BUId: json['BUId']?.toString() ?? "",
     );
   }
 
@@ -71,6 +74,7 @@ class CommonDetailModel {
       'url_1': url_1,
       'url_2': url_2,
       'uId': uId,
+      'BUId': BUId,
     };
   }
 }

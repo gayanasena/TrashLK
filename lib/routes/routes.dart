@@ -5,8 +5,8 @@ import 'package:wasteapp/features/home/data/model/detail_model.dart';
 import 'package:wasteapp/features/home/presentation/pages/category_finder_view.dart';
 import 'package:wasteapp/features/home/presentation/pages/home_screen.dart';
 import 'package:wasteapp/features/home/presentation/pages/item_detail_view.dart';
-// import 'package:wasteapp/features/home/presentation/pages/items_grid_view.dart';
 import 'package:wasteapp/features/home/presentation/pages/near_by_bins.dart';
+import 'package:wasteapp/features/home/presentation/pages/payments_view.dart';
 import 'package:wasteapp/features/home/presentation/pages/qr_scan_view.dart';
 
 import '../features/auth/presentation/pages/login_screen.dart';
@@ -21,7 +21,7 @@ class ScreenRoutes {
 
   static const String toHomeScreen = 'toHomeScreen';
 
-  static const String toItemGridScreen = 'toItemGridScreen';
+  static const String toPayemntScreen = 'toPayemntScreen';
 
   static const String toItemDetailScreen = 'toItemDetailScreen';
 
@@ -56,12 +56,6 @@ class Router {
       case ScreenRoutes.toHomeScreen:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
 
-      // case ScreenRoutes.toItemGridScreen:
-      //   var args =
-      //       settings.arguments != null ? settings.arguments as String : "";
-
-      //   return MaterialPageRoute(builder: (_) => ItemGridView(gridType: args));
-
       case ScreenRoutes.toItemDetailScreen:
         var args =
             settings.arguments != null
@@ -95,6 +89,9 @@ class Router {
 
       case ScreenRoutes.toNearByBinsScreen:
         return MaterialPageRoute(builder: (_) => const NearByBins());
+
+      case ScreenRoutes.toPayemntScreen:
+        return MaterialPageRoute(builder: (_) => const PaymentsView());
 
       default:
         return null;

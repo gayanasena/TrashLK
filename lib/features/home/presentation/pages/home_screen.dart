@@ -270,11 +270,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           } else if (category == "Nearby Bins") {
                             context.toNamed(ScreenRoutes.toNearByBinsScreen);
+                          } else if (category == "Payments") {
+                            context.toNamed(ScreenRoutes.toPayemntScreen);
                           } else {
-                            context.toNamed(
-                              ScreenRoutes.toItemGridScreen,
-                              args: category,
-                            );
+                            // context.toNamed(
+                            //   ScreenRoutes.,
+                            //   args: category,
+                            // );
                           }
                         },
                       ),

@@ -133,103 +133,160 @@ class _SchedulesViewState extends State<SchedulesView> {
                 itemCount: lisFilterd.length,
                 itemBuilder: (context, index) {
                   final item = lisFilterd[index];
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    color: Colors.white,
-                    elevation: 4,
-                    child: InkWell(
-                      onTap: () {
-                        context.toNamed(
-                          ScreenRoutes.toItemDetailScreen,
-                          args: item,
-                        );
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Center(
-                                  child: Text(
-                                    item.title,
-                                    style: const TextStyle(
-                                      fontSize: 17.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const SizedBox(height: 4.0),
-                                Text(
-                                  item.description ?? "",
-                                  style: TextStyle(
-                                    fontSize: 15.0,
-                                    color: Colors.grey.shade800,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Row(
-                                  children: [
-                                    Icon(Icons.route),
-                                    SizedBox(width: 5.0),
-                                    Text(
-                                      item.location ?? "",
-                                      style: TextStyle(
-                                        fontSize: 15.0,
-                                        color: Colors.grey.shade800,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    (item.subLocation != null &&
-                                            item.subLocation!.isNotEmpty)
-                                        ? Text(
-                                          " to ${item.subLocation ?? ""} Route",
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.grey.shade800,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        )
-                                        : Container(),
-                                  ],
-                                ),
-                                (item.notes != null && item.notes!.isNotEmpty)
-                                    ? Row(
-                                      children: [
-                                        Icon(Icons.date_range),
-                                        SizedBox(width: 5.0),
-                                        Text(
-                                          " ${item.notes ?? ""}",
-                                          style: TextStyle(
-                                            fontSize: 15.0,
-                                            color: Colors.grey.shade800,
-                                          ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    )
-                                    : Container(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  return ScheduleCardView(item: item);
                 },
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ScheduleCardView extends StatelessWidget {
+  const ScheduleCardView({super.key, required this.item});
+
+  final CommonDetailModel item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 4,
+        child: Container(
+          color: Colors.white,
+          width: 350,
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top row with image and order ID
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.transparent,
+                    radius: 20,
+                    backgroundImage: AssetImage('assets/images/shadule.jpg'),
+                  ),
+                  SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        '${item.notes}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              // Delivery tag
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 91, 177, 94),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  "${item.category}",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+              // Location details
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.radio_button_checked, color: Colors.lime),
+                      SizedBox(width: 8),
+                      Text(
+                        '${item.location}',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  item.subLocation != ""
+                      ? Padding(
+                        padding: const EdgeInsets.fromLTRB(8.0, 2.0, 8.0, 3.0),
+                        child: SizedBox(
+                          height: 30,
+                          child: Text(
+                            " | \n | \n |",
+                            style: TextStyle(
+                              fontSize: 8.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      )
+                      : Container(),
+                  item.subLocation != ""
+                      ? Row(
+                        children: [
+                          Icon(Icons.radio_button_checked, color: Colors.green),
+                          SizedBox(width: 8),
+                          Text(
+                            '${item.subLocation}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      )
+                      : Container(),
+                ],
+              ),
+              SizedBox(height: 10),
+              // Description text
+              Text(
+                '${item.description}',
+                style: TextStyle(color: Colors.blueGrey, fontSize: 15.0),
+              ),
+              SizedBox(height: 10),
+              // View details button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    context.toNamed(
+                      ScreenRoutes.toItemDetailScreen,
+                      args: item,
+                    );
+                  },
+                  label: Text(
+                    'View Details',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -15,7 +15,7 @@ class ServiceGrid extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           ServiceButton(
-            title: " Schedules",
+            title: "Schedules",
             icon: Icons.schedule,
             onClick: () {
               showShadulesModal(context);
