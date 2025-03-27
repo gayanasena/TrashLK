@@ -183,48 +183,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     builder: (BuildContext context) {
                                       return GestureDetector(
                                         onTap: () async {
-                                          // context.toNamed(
-                                          //   ScreenRoutes.toItemDetailScreen,
-                                          //   args: item,
-                                          // );
-
-                                          // final List<Bin> binsNearKurunegala = [
-                                          //   Bin(
-                                          //     capacity: 100,
-                                          //     inService: true,
-                                          //     lang: 7.4868,
-                                          //     long: 80.3648,
-                                          //     location: 'Kurunegala Town',
-                                          //     ownerId: 'owner_1',
-                                          //     reference: 'bin_1',
-                                          //     type: 'user',
-                                          //   ),
-                                          //   Bin(
-                                          //     capacity: 80,
-                                          //     inService: true,
-                                          //     lang: 7.4805,
-                                          //     long: 80.3671,
-                                          //     location: 'Wehera Junction',
-                                          //     ownerId: 'owner_2',
-                                          //     reference: 'bin_2',
-                                          //     type: 'user',
-                                          //   ),
-                                          //   Bin(
-                                          //     capacity: 120,
-                                          //     inService: true,
-                                          //     lang: 7.5001,
-                                          //     long: 80.3786,
-                                          //     location: 'Malkaduwawa',
-                                          //     ownerId: 'owner_3',
-                                          //     reference: 'bin_3',
-                                          //     type: 'user',
-                                          //   ),
-                                          // ];
-
-                                          // await firebaseServices.uploadBinList(
-                                          //   binsNearKurunegala,
-                                          //   DBConstants.binsCollection,
-                                          // );
+                                          context.toNamed(
+                                            ScreenRoutes.toItemDetailScreen,
+                                            args: item,
+                                          );
                                         },
                                         child: CarouselCard(
                                           imageUrl:
